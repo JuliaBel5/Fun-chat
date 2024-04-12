@@ -1,0 +1,24 @@
+{
+  "name": "fun-chat",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint \"src/**/*.{js,mjs,cjs,ts,mts}\"",
+    "lint:fix": "eslint \"src/**/*.{js,mjs,cjs,ts,mts}\" --fix"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-kit": "^10.27.0",
+    "prettier": "^3.2.5",
+    "sass": "^1.75.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+}
