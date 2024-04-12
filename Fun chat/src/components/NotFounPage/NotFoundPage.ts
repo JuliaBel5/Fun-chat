@@ -4,7 +4,7 @@ export class NotFoundPage {
   gameArea: HTMLDivElement | undefined
 
   constructor() {
-    this.init()
+   
   }
 
   init() {

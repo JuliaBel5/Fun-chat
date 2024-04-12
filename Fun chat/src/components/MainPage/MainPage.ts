@@ -4,7 +4,7 @@ export class MainPage {
   gameArea: HTMLDivElement | undefined
 
   constructor() {
-    this.init()
+  
   }
 
   init() {

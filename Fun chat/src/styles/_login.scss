@@ -1,0 +1,145 @@
+@import './variables';
+@import './mixins';
+@import url('https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Lobster&family=Tillana:wght@400;500;600;700;800&display=swap');
+
+.gamearea {
+  display: flex;
+  width: fit-content;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  display: flex;
+
+  flex-wrap: wrap;
+  width: 800px;
+  height: 780px;
+  border: 3px solid rgba(106, 24, 24, 0.418);
+  border-radius: 10px;
+  box-sizing: content-box;
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to left,
+      rgba(242, 228, 231, 0.113),
+      rgba(178, 171, 172, 0.181));
+}
+
+@media screen and (max-width: 900px) {
+  .container {
+    width: 750px;
+  }
+}
+
+.startContainer {
+  display: flex;
+
+  flex-wrap: wrap;
+  width: 800px;
+  height: 700px;
+  border: 3px solid rgba(106, 24, 24, 0.418);
+  border-radius: 10px;
+  box-sizing: content-box;
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to left,
+      rgba(242, 228, 231, 0.113),
+      rgba(178, 171, 172, 0.181));
+}
+
+@media screen and (max-width: 900px) {
+  .startContainer {
+    width: 750px;
+  }
+}
+
+.welcomeMessage {
+  font-family: 'Gochi Hand', cursive;
+  font-size: 36px;
+  color: rgb(106, 123, 91);
+  width: 80%;
+  text-align: center;
+}
+
+.inputContainer {
+  display: flex;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  padding: 10px;
+  box-sizing: content-box;
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to left,
+      rgba(248, 235, 237, 0.4),
+      rgba(184, 166, 169, 0.4));
+  border-radius: 10px;
+}
+
+.leftPanel {
+  width: 58%;
+  height: 800px;
+  background: url('loginCat.png');
+  background-size: cover;
+  background-position: -50px -30px;
+}
+
+.leftStartPanel {
+  width: 58%;
+  background: url('aboutCat.png');
+  background-size: cover;
+  background-position: -50px 0px;
+}
+
+.rightPanel {
+  padding-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  flex-direction: column;
+  width: 42%;
+}
+
+.rightStartPanel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  flex-direction: column;
+  width: 40%;
+}
+
+.input {
+  display: block;
+  border-radius: 7px;
+  border: 1px solid $redBook;
+  width: 250px;
+  height: 30px;
+  font-family: 'Tillana', system-ui;
+  font-size: 18px;
+  font-weight: 500;
+  color: $greenBook;
+}
+
+.label {
+  color: hsl(6, 37%, 45%);
+  font-family: 'Lobster', sans-serif;
+  font-size: 18px;
+}
+
+.loginButton {
+  @include startButton;
+}
+
+.startButton {
+  @include startButton;
+  width: 250px;
+}
+
+.error {
+  color: red;
+  font-size: 14px;
+}

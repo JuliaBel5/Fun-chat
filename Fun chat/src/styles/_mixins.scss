@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Lobster&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Lobster&family=Tillana:wght@400;500;600;700;800&display=swap');
+
+@import './variables';
+
+@mixin startButton {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 50px;
+  border: 2px solid $redBook;
+  text-align: center;
+  border-radius: 10px;
+  color: $greenBook;
+  font-family: 'Gochi Hand', cursive;
+  font-weight: 400;
+  font-size: 24px;
+  cursor: pointer;
+  background: linear-gradient(
+    to right,
+    rgba(246, 240, 228, 0.216),
+    rgba(235, 175, 140, 0.164)
+  );
+  box-shadow: 2px 2px 4px rgba(85, 84, 84, 0.4);
+  transition: background 0.5s ease;
+
+  &:hover {
+    background: linear-gradient(
+      to left,
+      rgba(246, 240, 228, 0.216),
+      rgba(230, 184, 158, 0.164)
+    );
+    border: 2px solid rgba(151, 6, 40, 0.9);
+  }
+}
+
+@mixin blueButton {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 50px;
+  border: 2px solid $blueButtonBorder;
+  text-align: center;
+  border-radius: 10px;
+  color: $blueColor;
+  font-weight: 400;
+  cursor: pointer;
+  background: linear-gradient(to right, $blueSelectOption0, $selectHover);
+  transition: background 0.5s ease;
+
+  &:hover {
+    background: linear-gradient(to left, $blueSelectOption0, $selectHover);
+    border: 2px solid $blueButtonBorderHover;
+  }
+
+  @media (max-width: 600px) {
+    max-width: 80px;
+    @content;
+  }
+}
+
+@mixin invertedBlueButton {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 50px;
+  border: 2px solid $blueButtonBorder;
+  text-align: center;
+  border-radius: 10px;
+  color: $blueColor;
+  font-weight: 400;
+  cursor: pointer;
+  background: linear-gradient(to left, $blueSelectOption0, $selectHover);
+  transition: background 0.5s ease;
+
+  &:hover {
+    background: linear-gradient(to right, $blueSelectOption0, $selectHover);
+    border: 2px solid $blueButtonBorderHover;
+  }
+
+  @media (max-width: 600px) {
+    max-width: 80px;
+    @content;
+  }
+}
+
+@mixin pinkButton {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 50px;
+  border: 2px solid pink;
+  text-align: center;
+  border-radius: 10px;
+  color: $modalMessagePink;
+  font-weight: 400;
+  cursor: pointer;
+  background: linear-gradient(
+    to right,
+    $modalButtonBackgroundStartColorPink,
+    $modalButtonBackgroundEndColorPink
+  );
+  transition: background 0.5s ease;
+
+  &:hover {
+    background: linear-gradient(
+      to left,
+      $modalButtonBackgroundStartColorPink,
+      $modalButtonBackgroundEndColorPink
+    );
+    border: 2px solid $pinkColor;
+  }
+
+  @media (max-width: 600px) {
+    max-width: 80px;
+    @content;
+  }
+}
+
+@mixin invertedPinkButton {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 50px;
+  border: 2px solid pink;
+  text-align: center;
+  border-radius: 10px;
+  color: $modalMessagePink;
+  font-weight: 400;
+  cursor: pointer;
+  background: linear-gradient(
+    to left,
+    $modalButtonBackgroundStartColorPink,
+    $modalButtonBackgroundEndColorPink
+  );
+  transition: background 0.5s ease;
+
+  &:hover {
+    background: linear-gradient(
+      to right,
+      $modalButtonBackgroundStartColorPink,
+      $modalButtonBackgroundEndColorPink
+    );
+    border: 2px solid rgb(212, 146, 161);
+  }
+
+  @media (max-width: 600px) {
+    max-width: 80px;
+    @content;
+  }
+}
+
+@mixin pinkSelector {
+  font-family: 'Lobster', sans-serif;
+  font-weight: 300;
+  border-radius: 5px;
+  border: 2px solid rgb(212, 146, 161);
+  width: 70px;
+  background-color: rgba(250, 221, 225, 0.8);
+  padding-left: 2px;
+
+  &:hover {
+    border: 2px solid rgb(185, 112, 129);
+  }
+
+  &:checked {
+    border: 2px solid rgb(185, 112, 129);
+  }
+}
+
+@mixin blueSelector {
+  font-family: 'Lobster', sans-serif;
+  font-weight: 300;
+  border-radius: 5px;
+  border: 2px solid rgb(164, 159, 217);
+  width: 70px;
+  background-color: rgba(202, 227, 242, 0.8);
+  padding-left: 2px;
+
+  &:hover {
+    border: 2px solid rgb(133, 125, 221);
+  }
+
+  &:checked {
+    border: 2px solid rgb(133, 125, 221);
+  }
+}

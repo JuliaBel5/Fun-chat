@@ -1,0 +1,21 @@
+@import './styles/login';
+@import './styles/mixins';
+@import './styles/variables';
+
+
+body {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(246, 224, 200);
+  background-size: cover;
+  background-repeat: no-repeat;
+  gap: 15px;
+
+}

@@ -19,7 +19,7 @@ export class LoginPage {
   audio: HTMLAudioElement | undefined
 
   constructor() {
-    this.init()
+   
   }
 
   init(): void {
