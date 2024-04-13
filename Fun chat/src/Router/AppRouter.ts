@@ -2,6 +2,7 @@ import { AboutPage } from "../components/AboutPage/AboutPage";
 import { LoginPage } from "../components/LoginPage/LoginPage";
 import { MainPage } from "../components/MainPage/MainPage";
 import { NotFoundPage } from "../components/NotFounPage/NotFoundPage";
+import { Validation } from "../components/validation"
 
 interface Page {
     init(): void;
@@ -14,25 +15,39 @@ export class AppRouter {
     private routes: { [key: string]: any };
     private currentPage: Page | undefined;
     about: AboutPage;
-    login: LoginPage;
     main: MainPage;
 
-    constructor() {
+    validation: Validation;
+    loginPage: LoginPage | undefined;
 
-        window.addEventListener('popstate', () => this.navigate());
-        this.about = new AboutPage()
-        this.login =  new LoginPage()
-        this.main = new MainPage()
+    constructor() {
         
+        window.addEventListener('popstate', () => this.navigate());
+        this.main =  new MainPage()
+        this.about = new AboutPage()
+        this.validation  =  new Validation()
+        this.loginPage = this.validation.login
+
         this.routes = {
-            '/': new LoginPage(),
+            '/':  this.validation,
             '/about': this.about, 
-            '/login': this.login,
+            '/login': this.validation,
             '/main': this.main,
         };
-        this.about.bindMainPage(this.goToMain)
-        this.about.bindLoginPage(this.goToLogin)
-        this.navigate();
+       
+        window.addEventListener('loginSuccessful', () => this.goToMain());
+        window.addEventListener('logoutSuccessful', () => this.goToLogin())
+        if(this.loginPage) {
+        this.loginPage.bindGoAboutButton(this.goToAbout)
+        this.loginPage.bindSubmit(this.goToMain)
+        }
+        if (this.main.header &&  this.main.header.goToAbout) {
+           this.main.header.bindGoAboutButton(this.goToAbout)
+        }
+        this.about.bindMainPage(this.navigateBasedOnSession)
+        this.about.bindLoginPage(this.navigateBasedOnSession)
+        this.checkSessionAndNavigate();
+     
     }
    
     navigate(path?: string) {
@@ -41,9 +56,10 @@ export class AppRouter {
         }
 
         if (path) {
-            window.history.pushState({}, '', path);
+            window.history.pushState(path, '', path);
         } else {
-            window.history.pushState({}, '', window.location.pathname);
+            window.history.replaceState(window.location.pathname, '', window.location.pathname);
+            
         }
 
         const currentPath = window.location.pathname;
@@ -51,15 +67,49 @@ export class AppRouter {
         this.currentPage?.init();
     }
 
-  goTo(path: string) {
+    goTo(path: string) {
       this.navigate(path);
   }
-goToMain = () => {
+    goToMain = () => {
         this.navigate('/main');
     }
 
     goToLogin = () => {
         this.navigate('/login');
+    }
+
+    goToAbout = () => {
+        this.navigate('/about');
+    }
+
+    checkSessionAndNavigate = () => {
+        const userData = sessionStorage.getItem('MrrrChatUser');
+        const currentPath = window.location.pathname;
+
+        if (userData) {
+            if (currentPath === '/' || currentPath === '/login') {
+                this.navigate('/main');
+            } else {
+                this.navigate()
+            }
+        } else {
+           
+            if (currentPath === '/main') {
+                this.navigate('/login');
+            } else {
+                this.navigate()
+            }
+        }
+           
+    }
+    navigateBasedOnSession = () => {
+        const userData = sessionStorage.getItem('MrrrChatUser');
+        
+        if (userData) {
+            this.navigate('/main');
+        } else {
+            this.navigate('/login');
+        }
     }
 
 }

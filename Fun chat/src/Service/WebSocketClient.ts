@@ -77,7 +77,7 @@ this.socket.send(JSON.stringify(request));
   
 }
 
-// Usage
+// Usage for later
 const webSocketClient = new WebSocketClient('ws://localhost:4000');
 webSocketClient.connect();
   

@@ -29,13 +29,12 @@ export class AboutPage {
     this.gameArea = createElement('div', 'gamearea')
      document.body.append(this.gameArea)
     const container = createElement('div', 'startContainer')
+   
 
-
-    console.log(`Welcome to CatFunChat!`)
     const welcome = createElement(
       'p',
       'welcomeMessage',
-      `Welcome to CatFunChat!`
+      `Welcome to MrrrrrChat!`
     )
 
     const leftPanel = createElement('div', 'leftStartPanel')

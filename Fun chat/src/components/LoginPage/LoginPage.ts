@@ -10,16 +10,30 @@ export class LoginPage {
 
   firstNameError: HTMLParagraphElement | undefined
 
-  lastNameInput: HTMLInputElement | undefined
+  passwordInput: HTMLInputElement | undefined
 
-  lastNameError: HTMLParagraphElement | undefined
+  passwordError: HTMLParagraphElement | undefined
 
-  loginButton: HTMLButtonElement | undefined
+  loginButton: HTMLButtonElement 
 
   audio: HTMLAudioElement | undefined
 
+  goToAbout: HTMLButtonElement 
+
   constructor() {
-   
+    this.loginButton = createElement(
+      'button',
+      'disabled',
+      'Login',
+      'loginButton'
+    )
+
+       this.goToAbout = createElement(
+      'button',
+      'aboutButton',
+      'Go to About Page',
+      'goToAbout'
+    )
   }
 
   init(): void {
@@ -43,7 +57,7 @@ export class LoginPage {
       }
     })
     const rightPanel = createElement('div', 'rightPanel')
-    const firstNameLabel = createElement('label', 'label', 'First Name')
+    const firstNameLabel = createElement('label', 'label', 'Name')
     this.firstNameInput = createInputElement(
       'input',
       'input',
@@ -53,29 +67,27 @@ export class LoginPage {
     )
     firstNameLabel.htmlFor = 'firstName'
     this.firstNameError = createElement('p', 'error', '', 'firstNameError')
-    const lastNameLabel = createElement('label', 'label', 'Surname')
-    this.lastNameInput = createInputElement('input', 'input', '', 'lastName', {
+    const passwordLabel = createElement('label', 'label', 'Password')
+    this.passwordInput = createInputElement('input', 'input', '', 'password', {
       required: true
     })
-    lastNameLabel.htmlFor = 'lastName'
-    this.lastNameError = createElement('p', 'error', '', 'lastNameError')
-    this.loginButton = createElement(
-      'button',
-      'disabled',
-      'Login',
-      'loginButton'
-    )
+    this.passwordInput.type = 'password'
+    passwordLabel.htmlFor = 'password'
+    this.passwordError = createElement('p', 'error', '', 'passwordError')
+    
     this.gameArea.append(container)
     container.append(leftPanel, rightPanel)
-    rightPanel.append(welcome, buttonContainer)
+    rightPanel.append(welcome, buttonContainer,  this.goToAbout )
+    this.loginButton.disabled = true;
+
     buttonContainer.append(
       firstNameLabel,
       this.firstNameInput,
       this.firstNameError,
-      lastNameLabel,
-      this.lastNameInput,
-      this.lastNameError,
-      this.loginButton
+      passwordLabel,
+      this.passwordInput,
+      this.passwordError,
+      this.loginButton,
     )
 
     this.firstNameInput.addEventListener('invalid', (e: Event) => {
@@ -87,12 +99,12 @@ export class LoginPage {
       ;(e.target as HTMLInputElement).setCustomValidity('')
     })
 
-    this.lastNameInput.addEventListener('invalid', (e: Event) => {
+    this.passwordInput.addEventListener('invalid', (e: Event) => {
       ;(e.target as HTMLInputElement).setCustomValidity(
         'Please enter your last name.'
       )
     })
-    this.lastNameInput.addEventListener('input', (e: Event) => {
+    this.passwordInput.addEventListener('input', (e: Event) => {
       ;(e.target as HTMLInputElement).setCustomValidity('')
     })
   }
@@ -105,9 +117,9 @@ export class LoginPage {
     }
   }
 
-  bindLastNameInput(handler: HandlerFunction): void {
-    if (this.lastNameInput instanceof HTMLInputElement) {
-      this.lastNameInput.addEventListener('input', () => {
+  bindpasswordInput(handler: HandlerFunction): void {
+    if (this.passwordInput instanceof HTMLInputElement) {
+      this.passwordInput.addEventListener('input', () => {
         handler()
       })
     }
@@ -115,11 +127,22 @@ export class LoginPage {
 
   bindSubmit(handler: HandlerFunction): void {
     if (this.loginButton) {
-      this.loginButton.addEventListener('click', () => {
+      this.loginButton.addEventListener('click', (e) => {
+        e.preventDefault()
         handler()
       })
     }
   }
+
+  bindGoAboutButton = (handler: HandlerFunction): void => {
+        if (this.goToAbout) {
+      this.goToAbout.addEventListener('click', () => {
+               handler()
+      })
+    } 
+    
+  }
+
   hide() {
     if (this.gameArea) {
         this.gameArea.remove();

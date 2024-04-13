@@ -1,0 +1,73 @@
+@import './variables';
+@import './mixins';
+@import url('https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Lobster&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Lobster&family=Tillana:wght@400;500;600;700;800&display=swap');
+
+.toast-container {
+  position: fixed;
+  top: 100px;
+  right: -300px;
+  transition: right 0.5s linear;
+  z-index: 1;
+  background-color: rgba(247, 236, 218, 0.8);
+  ;
+  border-radius: 7px;
+  padding: 5px;
+}
+
+.toast-button-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.toast {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 280px;
+
+  color: rgb(28, 26, 22);
+  padding: 10px;
+
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'Lobster', sans-serif;
+
+  z-index: 10;
+}
+
+.show {
+  right: 80px;
+}
+
+.toast-confirm-button,
+.toast-cancel-button {
+  background-color: $greenBook;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  text-align: center;
+  font-family: 'Gochi Hand', cursive;
+  text-decoration: none;
+  border-radius: 7px;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.toast-cancel-button {
+  background-color: $redBook;
+}
+
+.toast-confirm-button:hover {
+  background-color: rgb(182, 251, 121);
+  color: black;
+}
+
+.toast-cancel-button:hover {
+  background-color: hsl(6, 84%, 70%);
+  color: black;
+}

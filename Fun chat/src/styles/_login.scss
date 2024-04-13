@@ -3,18 +3,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Lobster&family=Tillana:wght@400;500;600;700;800&display=swap');
 
 .gamearea {
-  display: flex;
   width: fit-content;
+  margin: auto;
   justify-content: center;
   align-items: center;
 }
 
 .container {
   display: flex;
-
   flex-wrap: wrap;
   width: 800px;
-  height: 780px;
+  height: 700px;
   border: 3px solid rgba(106, 24, 24, 0.418);
   border-radius: 10px;
   box-sizing: content-box;
@@ -44,6 +43,22 @@
       rgba(242, 228, 231, 0.113),
       rgba(178, 171, 172, 0.181));
 }
+
+.mainContainer {
+  display: flex;
+
+  flex-wrap: wrap;
+  width: 800px;
+  min-height: 500px;
+  border: 3px solid rgba(106, 24, 24, 0.418);
+  border-radius: 10px;
+  box-sizing: content-box;
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to left,
+      rgba(242, 228, 231, 0.113),
+      rgba(178, 171, 172, 0.181));
+}
+
 
 @media screen and (max-width: 900px) {
   .startContainer {
@@ -80,10 +95,10 @@
 
 .leftPanel {
   width: 58%;
-  height: 800px;
+  height: 100%;
   background: url('loginCat.png');
   background-size: cover;
-  background-position: -50px -30px;
+  background-position: -50px 0px;
 }
 
 .leftStartPanel {
@@ -130,13 +145,37 @@
   font-size: 18px;
 }
 
-.loginButton {
-  @include startButton;
-}
-
 .startButton {
   @include startButton;
-  width: 250px;
+  width: 200px;
+}
+
+.aboutButton {
+  @include startButton;
+  margin-top: 20px;
+  width: 200px;
+}
+
+.disabled {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 200px;
+  height: 50px;
+  border: 2px solid #888787;
+  text-align: center;
+  border-radius: 10px;
+  color: #666666;
+  font-weight: 400;
+  cursor: not-allowed;
+  background: linear-gradient(to left, #f7f3f3, #bfbbbb);
+  transition: background 0.5s ease;
+
+  &:hover {
+    background: linear-gradient(to right, #f7f3f3, #bfbbbb);
+    border: 2px solid #2f2e2e;
+  }
 }
 
 .error {

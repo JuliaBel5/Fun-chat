@@ -8,8 +8,10 @@ export class NotFoundPage {
   }
 
   init() {
-    this.gameArea = createElement('div', 'gamearea')
+    this.gameArea = createElement('div', 'gamearea', "Please, check your URL")
+    document.body.append(this.gameArea)
   }
+
 
   hide() {
     if (this.gameArea) {

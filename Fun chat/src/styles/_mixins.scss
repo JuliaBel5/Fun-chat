@@ -18,20 +18,16 @@
   font-weight: 400;
   font-size: 24px;
   cursor: pointer;
-  background: linear-gradient(
-    to right,
-    rgba(246, 240, 228, 0.216),
-    rgba(235, 175, 140, 0.164)
-  );
+  background: linear-gradient(to right,
+      rgba(246, 240, 228, 0.216),
+      rgba(235, 175, 140, 0.164));
   box-shadow: 2px 2px 4px rgba(85, 84, 84, 0.4);
   transition: background 0.5s ease;
 
   &:hover {
-    background: linear-gradient(
-      to left,
-      rgba(246, 240, 228, 0.216),
-      rgba(230, 184, 158, 0.164)
-    );
+    background: linear-gradient(to left,
+        rgba(246, 240, 228, 0.216),
+        rgba(230, 184, 158, 0.164));
     border: 2px solid rgba(151, 6, 40, 0.9);
   }
 }
@@ -103,19 +99,15 @@
   color: $modalMessagePink;
   font-weight: 400;
   cursor: pointer;
-  background: linear-gradient(
-    to right,
-    $modalButtonBackgroundStartColorPink,
-    $modalButtonBackgroundEndColorPink
-  );
+  background: linear-gradient(to right,
+      $modalButtonBackgroundStartColorPink,
+      $modalButtonBackgroundEndColorPink );
   transition: background 0.5s ease;
 
   &:hover {
-    background: linear-gradient(
-      to left,
-      $modalButtonBackgroundStartColorPink,
-      $modalButtonBackgroundEndColorPink
-    );
+    background: linear-gradient(to left,
+        $modalButtonBackgroundStartColorPink,
+        $modalButtonBackgroundEndColorPink );
     border: 2px solid $pinkColor;
   }
 
@@ -138,19 +130,15 @@
   color: $modalMessagePink;
   font-weight: 400;
   cursor: pointer;
-  background: linear-gradient(
-    to left,
-    $modalButtonBackgroundStartColorPink,
-    $modalButtonBackgroundEndColorPink
-  );
+  background: linear-gradient(to left,
+      $modalButtonBackgroundStartColorPink,
+      $modalButtonBackgroundEndColorPink );
   transition: background 0.5s ease;
 
   &:hover {
-    background: linear-gradient(
-      to right,
-      $modalButtonBackgroundStartColorPink,
-      $modalButtonBackgroundEndColorPink
-    );
+    background: linear-gradient(to right,
+        $modalButtonBackgroundStartColorPink,
+        $modalButtonBackgroundEndColorPink );
     border: 2px solid rgb(212, 146, 161);
   }
 
@@ -193,5 +181,57 @@
 
   &:checked {
     border: 2px solid rgb(133, 125, 221);
+  }
+}
+
+@mixin SubmitButton {
+  display: inline-flex;
+  background-color: $redBook;
+  border: 2px solid $greenBook;
+  width: 10%;
+  min-width: 70px;
+  border-radius: 7px;
+  color: rgb(240, 237, 136);
+  height: 35px;
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 20px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: rgb(236, 162, 101);
+    color: #e1edc4;
+  }
+}
+
+@mixin SubmitButtonDisabled {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 10%;
+  min-width: 70px;
+  height: 35px;
+  border: 2px solid #888787;
+  text-align: center;
+  border-radius: 7px;
+  color: #666666;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-weight: 600;
+  font-size: 16px;
+  display: inline-block;
+  cursor: not-allowed;
+  background: linear-gradient(to left, #f7f3f3, #bfbbbb);
+  margin: 20px 20px;
+  transition: background 0.5s ease;
+
+  &:hover {
+    background: linear-gradient(to right, #f7f3f3, #bfbbbb);
+    border: 2px solid #2f2e2e;
   }
 }
