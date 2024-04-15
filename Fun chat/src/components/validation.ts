@@ -1,6 +1,8 @@
 
+import { WebSocketClient } from '../Service/WebSocketClient'
 import { showLoader } from '../Utils/loader'
 import { LoginPage } from './LoginPage/LoginPage'
+import { MainPage } from './MainPage/MainPage'
 
 type userData = {
   firstName: string
@@ -12,12 +14,14 @@ export class Validation {
 
 
   user: string | undefined
-
-  login: LoginPage | undefined
+  main: MainPage 
+  login: LoginPage 
   password: string | undefined
+ // webSocketClient: WebSocketClient = new WebSocketClient('ws://localhost:4000');
  
   constructor() {
     this.login = new LoginPage()
+    this.main = new MainPage()
   }
 
   init() {
@@ -29,7 +33,8 @@ if (this.login) {
       this.login.bindpasswordInput(this.handleErrors)
       this.login.bindSubmit(this.handleSubmit)
 }
-    //}
+
+// this.webSocketClient.connect();
   }
 
   handleSubmit = (): void => {
@@ -50,21 +55,27 @@ if (this.login) {
       this.userAuthData.firstName = firstNameValue
       this.userAuthData.password = passwordValue
       this.user = firstNameValue
+      this.main.user = firstNameValue
+      if (this.main.userList)  {this.main.userList.user = firstNameValue
+      console.log(3, this.main.userList.user)}
       this.password = passwordValue
       sessionStorage.setItem('MrrrChatUser', JSON.stringify(this.userAuthData))
-
-      if (this.login.gameArea) {
-        this.login.hide()
+      this.main.id = this.main.generateUniqueTimestampID()
+      if (this.user && this.password) {
+      this.main.webSocketClient.loginUser(this.main.id, this.user, this.password)
+     }
+     
+   
         showLoader()
 
         setTimeout(() => {
-          this.user = this.userAuthData?.firstName
-          this.password = this.userAuthData?.password
-          const event = new CustomEvent('loginSuccessful');
-          window.dispatchEvent(event);
-                    
-        }, 700)
-      }
+          
+        
+      //   const event = new CustomEvent('loginSuccessful');
+      //    window.dispatchEvent(event);
+            
+        }, 1000)
+      
     }
   }
 

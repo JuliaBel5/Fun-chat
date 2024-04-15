@@ -1,8 +1,10 @@
+import { WebSocketClient } from "../../Service/WebSocketClient"
 import { createElement } from "../../Utils/createElement"
 import { showLoader } from "../../Utils/loader"
+import { ActiveUsersList, ErrorMessage, HistoryOfMessages, InactiveUsersList, MessageDeleted, MessageDelivered, MessageEdited, MessageSent, MessageSentFromUser, ReadStatusChange, ReadStatusNotification, ThirdPartyUserLogin, ThirdPartyUserLogout, User, UserLogin, UserLogout } from "../EventEmitter/types"
 import { Toast } from "../toast"
-import { Validation } from "../validation"
 import { Header } from "./header"
+import { UserList } from "./leftPanel"
 
 export class MainPage {
   gameArea: HTMLDivElement | undefined
@@ -16,30 +18,53 @@ export class MainPage {
   leftInputContainer: HTMLDivElement | undefined
   submitButton: HTMLButtonElement | undefined
   activeChat: HTMLDivElement | undefined
-  user: any
+  user: string | undefined
   toast: Toast = new Toast()
-  login: any
-  validation: Validation  = new Validation()
+  login: string | undefined
 
+  webSocketClient: WebSocketClient = new WebSocketClient('ws://localhost:4000');
+  password: string | undefined
+  startChatPanel: HTMLDivElement | undefined
+  userList: UserList | undefined
+  activeUsers: User[]  | undefined
+  inactiveUsers:  User[]  | undefined
+  id: string | undefined
+  activeChatId: string | undefined
+
+  
   constructor() {
  this.header =  new Header()
+ this.userList = new UserList();
+ if (!this.webSocketClient.isOpen()) {
+  this.webSocketClient.connect();
+ }
+ this.setupEventListeners();
+
+ this.activeUsers = []
+ this.inactiveUsers = []
 
   }
 
   init() {
     const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser')
-    if (MrrrChatUserData) {
+    if (MrrrChatUserData ) {
       this.user = JSON.parse(MrrrChatUserData).firstName
-       this.toast.bindConfirmButton(this.logout)
+      this.password = JSON.parse(MrrrChatUserData).password
+      
+      this.toast.bindConfirmButton(this.logout)
        if (this.header.nameContainer) {
        this.header.nameContainer.textContent = `User name: ${this.user}`
        }
-       this.startChat() 
- }
+       if (this.webSocketClient.isOpen()) {
+       this.webSocketClient.getAllAuthUsers()
+      this.webSocketClient.getAllUnauthUsers()
+       }
+       this.startChat()
+      }
 }
- 
 
   startChat() {
+    if (!this.userList) return
     this.gameArea = createElement('div', 'gamearea')
     document.body.append(this.gameArea)
     this.gameArea.append(this.header.header)
@@ -48,13 +73,11 @@ export class MainPage {
     this.gameArea.append(this.container)
    this.leftPanel = createElement('div', 'left-panel')
    this.rightPanel = createElement('div', 'right-panel')
-   this.leftInputContainer = createElement('div', 'search-container')
+  
+  
+   this.startChatPanel = createElement('div', 'start-chat', 'Choose a friend to chat with')
    this.rightInputContainer = createElement('div', 'input-container')
-   this.leftInput = createElement(
-    'input',
-    'left-input',
-    ''
-  )
+   
   this.activeChat = createElement('div', 'active-chat', 'Start to chat with your friend')
   this.mainInput = createElement(
     'input',
@@ -91,12 +114,26 @@ export class MainPage {
   }
   })
 
-  this.leftInputContainer.append(this.leftInput)
+  
   this.rightInputContainer.append(this.mainInput, this.submitButton)
-  this.leftPanel.append(this.leftInputContainer)
-  this.rightPanel.append(this.activeChat, this.rightInputContainer)
+  this.leftPanel.append(this.userList.leftInputContainer)
+  this.rightPanel.append(this.startChatPanel, this.activeChat, this.rightInputContainer)
+  this.activeChat.style.display = 'none'
+  this.rightInputContainer.style.display = 'none'
    this.container.append(this.leftPanel, this.rightPanel)
-  }
+   
+   this.userList.on('userClicked', (user) => {
+    this.activeChatId = user.login;
+    if (this.startChatPanel &&  this.activeChat && this.rightInputContainer) {
+    this.startChatPanel.style.height = "35px";
+    const status = user.isLogined ? "online" : "offline"
+    this.startChatPanel.textContent = `${user.login}, ${status}`
+    this.activeChat.style.display = 'flex'
+  this.rightInputContainer.style.display = 'flex'
+    }
+   });
+ 
+}
 
   hide() {
     if (this.gameArea) {
@@ -116,10 +153,14 @@ export class MainPage {
    }
 
    logout = () => {
+    if (this.user && this.password) {
+      console.log('logout',this.id, this.user, this.password)
+    this.webSocketClient.logoutUser(this.id, this.user, this.password)
+  }
     sessionStorage.removeItem('MrrrChatUser')
-    sessionStorage.removeItem('MrrrChatUserData')
-    const event = new CustomEvent('logoutSuccessful');
-    window.dispatchEvent(event);
+   
+
+  
    }
 
   confirm = () => {
@@ -127,4 +168,60 @@ export class MainPage {
       this.toast.show(`Are you sure you want to logout, ${this.user}?`)
     }
   }
+ setupEventListeners() {
+    this.webSocketClient.on('WEBSOCKET_OPEN', this.sendInitialRequests.bind(this));;
+ 
+ }
+
+ sendInitialRequests() {
+  this.webSocketClient.on('USER_LOGIN', this.loginSucces.bind(this))
+  this.webSocketClient.on('USER_LOGOUT',this.logoutSucces.bind(this))
+  this.webSocketClient.on('USER_ACTIVE', this.updateActiveUsers.bind(this));
+  this.webSocketClient.on('USER_INACTIVE', this.updateInactiveUsers.bind(this));
+  this.webSocketClient.on('USER_EXTERNAL_LOGIN', this.externalUserLogin.bind(this));
+  this.webSocketClient.on('USER_EXTERNAL_LOGOUT', this.externalUserLogout.bind(this))
+ if(this.user && this.password) {
+   this.id = this.generateUniqueTimestampID()
+   this.webSocketClient.loginUser(this.id, this.user, this.password)
+  }
+  console.log('я здесь')
+  this.webSocketClient.getAllAuthUsers()
+  this.webSocketClient.getAllUnauthUsers()
+ }
+
+public generateUniqueTimestampID() {
+  return Date.now() + Math.random().toString(36).substr(2, 9);
+}
+loginSucces (event: UserLogin) {
+console.log('логин прошел успешно')
+}
+logoutSucces(event: UserLogout) {
+  console.log('логаут прошел успешно')
+}
+  updateActiveUsers(event: ActiveUsersList) {
+    this.activeUsers = event.payload.users;
+       console.log(this.user)
+      if (this.userList) {
+     this.userList.updateActiveUsersList(this.activeUsers);
+    }
+   }
+   
+   updateInactiveUsers(event: InactiveUsersList) {
+    this.inactiveUsers = event.payload.users;
+        console.log(this.user)
+    if (this.userList) {
+    this.userList.updateInactiveUsersList(this.inactiveUsers);
+    }
+   }
+
+   externalUserLogin(event:ThirdPartyUserLogin) {
+  //const newLoggedInUser = event.payload.users[0]
+  this.webSocketClient.getAllAuthUsers()
+  this.webSocketClient.getAllUnauthUsers()
+   }
+
+  externalUserLogout(event:ThirdPartyUserLogout) {
+    this.webSocketClient.getAllAuthUsers()
+    this.webSocketClient.getAllUnauthUsers()
+}
 }

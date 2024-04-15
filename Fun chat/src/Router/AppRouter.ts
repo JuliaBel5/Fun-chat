@@ -2,6 +2,7 @@ import { AboutPage } from "../components/AboutPage/AboutPage";
 import { LoginPage } from "../components/LoginPage/LoginPage";
 import { MainPage } from "../components/MainPage/MainPage";
 import { NotFoundPage } from "../components/NotFounPage/NotFoundPage";
+import { Toast } from "../components/toast";
 import { Validation } from "../components/validation"
 
 interface Page {
@@ -16,17 +17,17 @@ export class AppRouter {
     private currentPage: Page | undefined;
     about: AboutPage;
     main: MainPage;
-
-    validation: Validation;
+       validation: Validation;
     loginPage: LoginPage | undefined;
 
     constructor() {
         
         window.addEventListener('popstate', () => this.navigate());
-        this.main =  new MainPage()
+       
         this.about = new AboutPage()
         this.validation  =  new Validation()
         this.loginPage = this.validation.login
+        this.main =  this.validation.main
 
         this.routes = {
             '/':  this.validation,
@@ -35,11 +36,13 @@ export class AppRouter {
             '/main': this.main,
         };
        
-        window.addEventListener('loginSuccessful', () => this.goToMain());
-        window.addEventListener('logoutSuccessful', () => this.goToLogin())
+  
+       this.main.webSocketClient.on('USER_LOGIN', () => this.goToMain())
+       this.main.webSocketClient.on('USER_LOGOUT', () => this.goToLogin())
+   
         if(this.loginPage) {
         this.loginPage.bindGoAboutButton(this.goToAbout)
-        this.loginPage.bindSubmit(this.goToMain)
+       // this.loginPage.bindSubmit(this.goToMain)
         }
         if (this.main.header &&  this.main.header.goToAbout) {
            this.main.header.bindGoAboutButton(this.goToAbout)
@@ -83,12 +86,17 @@ export class AppRouter {
     }
 
     checkSessionAndNavigate = () => {
-        const userData = sessionStorage.getItem('MrrrChatUser');
+        
         const currentPath = window.location.pathname;
-
-        if (userData) {
-            if (currentPath === '/' || currentPath === '/login') {
+        const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser')
+          if (MrrrChatUserData ) {
+          this.main.user = JSON.parse(MrrrChatUserData).firstName
+          this.main.password = JSON.parse(MrrrChatUserData).password
+          if (this.main.user &&  this.main.password) {
+            if (currentPath === '/' || currentPath === '/login' || currentPath === '/main') {
                 this.navigate('/main');
+               
+            }
             } else {
                 this.navigate()
             }

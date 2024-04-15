@@ -14,14 +14,14 @@ export class AboutPage {
     this.startButton = createElement(
       'button',
       'startButton',
-      'Go to Main Page',
-      'startButton'
+      'Main/Login Page',
+      
     )
     this.loginButton = createElement(
       'button',
       'startButton',
-      'Go to Login Page',
-      'startButton'
+      'Back',
+      
     )
   }
 
@@ -52,7 +52,7 @@ export class AboutPage {
     this.gameArea.append(container)
     container.append(leftPanel, rightPanel)
     if (this.startButton) {
-      rightPanel.append(welcome, this.loginButton, this.startButton)
+      rightPanel.append(welcome, this.startButton)
     }
   }
 
