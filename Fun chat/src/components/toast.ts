@@ -1,4 +1,4 @@
-import { createElement } from "../Utils/createElement"
+import { createElement } from '../Utils/createElement'
 
 type HandlerFunction = () => void
 
@@ -44,12 +44,20 @@ export class Toast {
     }, duration)
   }
 
+  public showNotification = (message: string, duration = 3000): void => {
+    this.toastContainer.classList.add('show')
+    this.toast.textContent = message
+    this.cancelButton.style.display = 'none'
+    this.confirmButton.style.display = 'none'
+    this.timeoutId = setTimeout(() => {
+      this.toastContainer.classList.remove('show')
+    }, duration)
+  }
+
   bindConfirmButton = (handler: HandlerFunction) =>
     this.confirmButton.addEventListener('click', () => {
       this.audio.src = 'click.mp3'
       this.audio.play()
       handler()
-      
-      
     })
 }

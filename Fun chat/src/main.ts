@@ -1,5 +1,5 @@
-import { AppRouter } from './Router/AppRouter';
-import { WebSocketClient } from './Service/WebSocketClient';
 import './styles.scss'
+import { AppRouter } from './Router/AppRouter'
+import { WebSocketClient } from './Service/WebSocketClient'
 
-new AppRouter();
+new AppRouter()

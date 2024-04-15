@@ -1,5 +1,4 @@
-import { createElement, createInputElement } from "../../Utils/createElement"
-
+import { createElement, createInputElement } from '../../Utils/createElement'
 
 type HandlerFunction = () => void
 
@@ -14,27 +13,13 @@ export class LoginPage {
 
   passwordError: HTMLParagraphElement | undefined
 
-  loginButton: HTMLButtonElement 
+  loginButton: HTMLButtonElement | undefined
 
   audio: HTMLAudioElement | undefined
 
-  goToAbout: HTMLButtonElement 
+  goToAbout: HTMLButtonElement | undefined
 
-  constructor() {
-    this.loginButton = createElement(
-      'button',
-      'disabled',
-      'Login',
-      'loginButton'
-    )
-
-       this.goToAbout = createElement(
-      'button',
-      'aboutButton',
-      'Go to About Page',
-      'goToAbout'
-    )
-  }
+  constructor() {}
 
   init(): void {
     this.gameArea = createElement('div', 'gamearea')
@@ -44,7 +29,20 @@ export class LoginPage {
     const welcome = createElement(
       'p',
       'welcomeMessage',
-      'Hi! Enter your name, please!'
+      'Hi! Enter your name, please!',
+    )
+    this.loginButton = createElement(
+      'button',
+      'disabled',
+      'Login',
+      'loginButton',
+    )
+
+    this.goToAbout = createElement(
+      'button',
+      'aboutButton',
+      'Go to About Page',
+      'goToAbout',
     )
     const buttonContainer = createElement('form', 'inputContainer')
     const leftPanel = createElement('div', 'leftPanel')
@@ -63,22 +61,22 @@ export class LoginPage {
       'input',
       '',
       'firstName',
-      { required: true }
+      { required: true },
     )
     firstNameLabel.htmlFor = 'firstName'
     this.firstNameError = createElement('p', 'error', '', 'firstNameError')
     const passwordLabel = createElement('label', 'label', 'Password')
     this.passwordInput = createInputElement('input', 'input', '', 'password', {
-      required: true
+      required: true,
     })
     this.passwordInput.type = 'password'
     passwordLabel.htmlFor = 'password'
     this.passwordError = createElement('p', 'error', '', 'passwordError')
-    
+
     this.gameArea.append(container)
     container.append(leftPanel, rightPanel)
-    rightPanel.append(welcome, buttonContainer,  this.goToAbout )
-    this.loginButton.disabled = true;
+    rightPanel.append(welcome, buttonContainer, this.goToAbout)
+    this.loginButton.disabled = true
 
     buttonContainer.append(
       firstNameLabel,
@@ -92,7 +90,7 @@ export class LoginPage {
 
     this.firstNameInput.addEventListener('invalid', (e: Event) => {
       ;(e.target as HTMLInputElement).setCustomValidity(
-        'Please enter your first name.'
+        'Please enter your first name.',
       )
     })
     this.firstNameInput.addEventListener('input', (e: Event) => {
@@ -101,7 +99,7 @@ export class LoginPage {
 
     this.passwordInput.addEventListener('invalid', (e: Event) => {
       ;(e.target as HTMLInputElement).setCustomValidity(
-        'Please enter your last name.'
+        'Please enter your last name.',
       )
     })
     this.passwordInput.addEventListener('input', (e: Event) => {
@@ -135,17 +133,16 @@ export class LoginPage {
   }
 
   bindGoAboutButton = (handler: HandlerFunction): void => {
-        if (this.goToAbout) {
+    if (this.goToAbout) {
       this.goToAbout.addEventListener('click', () => {
-               handler()
+        handler()
       })
-    } 
-    
+    }
   }
 
   hide() {
     if (this.gameArea) {
-        this.gameArea.remove();
+      this.gameArea.remove()
     }
-}
+  }
 }

@@ -1,173 +1,171 @@
-export type User = {
-  login: string;
-  isLogined: boolean;
- };
+export interface User {
+  login: string
+  isLogined: boolean
+}
 
- export type ThirdPartyUserLogin = {
-  id: null;
-  type: "USER_EXTERNAL_LOGIN";
+export interface ThirdPartyUserLogin {
+  id: null
+  type: 'USER_EXTERNAL_LOGIN'
   payload: {
-     users: User[];
-  };
- };
+    users: User[]
+  }
+}
 
- export type ThirdPartyUserLogout = {
-  id: null;
-  type: "USER_EXTERNAL_LOGOUT";
+export interface ThirdPartyUserLogout {
+  id: null
+  type: 'USER_EXTERNAL_LOGOUT'
   payload: {
-     users: User[];
-  };
- };
- 
-export type UserLogin = {
-  id: string,
-  type: "USER_LOGIN",
-  payload: {
-    users: User;
- };
-};
+    users: User[]
+  }
+}
 
-export type UserLogout = {
-  id: string,
-  type: "USER_LOGOUT",
+export interface UserLogin {
+  id: string
+  type: 'USER_LOGIN'
   payload: {
-    users: User;
- };
-};
+    users: User
+  }
+}
 
- export type ActiveUsersList = {
-  id: string;
-  type: "USER_ACTIVE";
+export interface UserLogout {
+  id: string
+  type: 'USER_LOGOUT'
   payload: {
-     users: User[];
-  };
- };
+    users: User
+  }
+}
 
- export type InactiveUsersList = {
-  id: string;
-  type: "USER_INACTIVE";
+export interface ActiveUsersList {
+  id: string
+  type: 'USER_ACTIVE'
   payload: {
-     users: User[];
-  };
- };
- export type MessageSent = {
-  id: string;
-  type: "MSG_SEND";
-  payload: {
-     message: {
-       id: string;
-       from: string;
-       to: string;
-       text: string;
-       datetime: number;
-       status: {
-         isDelivered: boolean;
-         isReaded: boolean;
-         isEdited: boolean;
-       };
-     };
-  };
- };
+    users: User[]
+  }
+}
 
- 
-  export type MessageSentFromUser = {
-  id: null,
-  type: "MSG_SEND",
+export interface InactiveUsersList {
+  id: string
+  type: 'USER_INACTIVE'
+  payload: {
+    users: User[]
+  }
+}
+export interface MessageSent {
+  id: string
+  type: 'MSG_SEND'
   payload: {
     message: {
-      id: string,
-      from: string,
-      to: string,
-      text: string,
-      datetime: number,
+      id: string
+      from: string
+      to: string
+      text: string
+      datetime: number
       status: {
-        isDelivered: boolean,
-        isReaded: boolean,
-        isEdited: boolean,
+        isDelivered: boolean
+        isReaded: boolean
+        isEdited: boolean
       }
     }
   }
 }
 
-
-export type HistoryOfMessages ={
-  id: string,
-  type: "MSG_FROM_USER",
-  payload: {
-    messages: [],
-  }
-}
-
-export type MessageDelivered = {
-  id: null,
-  type: "MSG_DELIVER",
+export interface MessageSentFromUser {
+  id: null
+  type: 'MSG_SEND'
   payload: {
     message: {
-      id: string,
+      id: string
+      from: string
+      to: string
+      text: string
+      datetime: number
       status: {
-        isDelivered: boolean,
+        isDelivered: boolean
+        isReaded: boolean
+        isEdited: boolean
       }
     }
   }
 }
 
-export type ReadStatusChange = {
-  id: string,
-  type: "MSG_READ"
+export interface HistoryOfMessages {
+  id: string
+  type: 'MSG_FROM_USER'
+  payload: {
+    messages: []
+  }
+}
+
+export interface MessageDelivered {
+  id: null
+  type: 'MSG_DELIVER'
   payload: {
     message: {
-      id: string,
+      id: string
       status: {
-        isReaded: boolean,
+        isDelivered: boolean
       }
     }
   }
 }
 
-export type ReadStatusNotification = {
-  id: null,
-  type: "MSG_READ"
+export interface ReadStatusChange {
+  id: string
+  type: 'MSG_READ'
   payload: {
     message: {
-      id: string,
+      id: string
       status: {
-        isReaded: boolean,
+        isReaded: boolean
       }
     }
   }
 }
 
-export type MessageDeleted = {
-  id: string,
-  type: "MSG_DELETE"
+export interface ReadStatusNotification {
+  id: null
+  type: 'MSG_READ'
   payload: {
     message: {
-      id: string,
+      id: string
       status: {
-        isDeleted: boolean,
+        isReaded: boolean
       }
     }
   }
 }
 
-export type MessageEdited = {
-  id: string,
-  type: "MSG_EDIT"
+export interface MessageDeleted {
+  id: string
+  type: 'MSG_DELETE'
   payload: {
     message: {
-      id: string,
-      text: string,
+      id: string
       status: {
-        isEdited: boolean,
+        isDeleted: boolean
       }
     }
   }
 }
 
-export type ErrorMessage = {
-  id: string,
-  type: "ERROR",
+export interface MessageEdited {
+  id: string
+  type: 'MSG_EDIT'
   payload: {
-    error: "incorrect payload parameters",
+    message: {
+      id: string
+      text: string
+      status: {
+        isEdited: boolean
+      }
+    }
+  }
+}
+
+export interface ErrorMessage {
+  id: string
+  type: 'ERROR'
+  payload: {
+    error: 'incorrect payload parameters'
   }
 }

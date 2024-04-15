@@ -1,40 +1,26 @@
-import { createElement } from "../../Utils/createElement"
- type HandlerFunction = () => void
+import { createElement } from '../../Utils/createElement'
+
+type HandlerFunction = () => void
 export class AboutPage {
   gameArea: HTMLDivElement | undefined
-  audio: HTMLAudioElement  = new Audio()
+  audio: HTMLAudioElement = new Audio()
   startButton: HTMLButtonElement
   loginButton: HTMLButtonElement
- 
 
-
-    constructor() {
-        
-
-    this.startButton = createElement(
-      'button',
-      'startButton',
-      'Main/Login Page',
-      
-    )
-    this.loginButton = createElement(
-      'button',
-      'startButton',
-      'Back',
-      
-    )
+  constructor() {
+    this.startButton = createElement('button', 'startButton', 'Main/Login Page')
+    this.loginButton = createElement('button', 'startButton', 'Back')
   }
 
   init() {
     this.gameArea = createElement('div', 'gamearea')
-     document.body.append(this.gameArea)
+    document.body.append(this.gameArea)
     const container = createElement('div', 'startContainer')
-   
 
     const welcome = createElement(
       'p',
       'welcomeMessage',
-      `Welcome to MrrrrrChat!`
+      `Welcome to MrrrrrChat!`,
     )
 
     const leftPanel = createElement('div', 'leftStartPanel')
@@ -47,7 +33,6 @@ export class AboutPage {
       }
     })
     const rightPanel = createElement('div', 'rightStartPanel')
- 
 
     this.gameArea.append(container)
     container.append(leftPanel, rightPanel)
@@ -74,7 +59,7 @@ export class AboutPage {
 
   hide() {
     if (this.gameArea) {
-        this.gameArea.remove();
+      this.gameArea.remove()
     }
   }
 }

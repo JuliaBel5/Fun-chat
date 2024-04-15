@@ -2,7 +2,7 @@ export function createElement<T extends keyof HTMLElementTagNameMap>(
   tag: T,
   className = '',
   content = '',
-  id?: string
+  id?: string,
 ): HTMLElementTagNameMap[T] {
   const element = document.createElement(tag)
 
@@ -26,7 +26,7 @@ export function createInputElement<T extends keyof HTMLElementTagNameMap>(
   className = '',
   content = '',
   id?: string,
-  attributes: Record<string, string | boolean> = {}
+  attributes: Record<string, string | boolean> = {},
 ): HTMLElementTagNameMap[T] {
   const element = document.createElement(tag)
   if (className) element.classList.add(className)
