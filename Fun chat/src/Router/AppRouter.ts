@@ -2,7 +2,7 @@ import { AboutPage } from '../components/AboutPage/AboutPage'
 import { LoginPage } from '../components/LoginPage/LoginPage'
 import { MainPage } from '../components/MainPage/MainPage'
 import { NotFoundPage } from '../components/NotFounPage/NotFoundPage'
-import { Validation } from '../components/validation'
+import { Start } from '../components/StartPage'
 
 
 interface Page {
@@ -11,30 +11,37 @@ interface Page {
 }
 
 export class AppRouter {
-  private routes: { [key: string]: AboutPage | MainPage | Validation | LoginPage}
+  private routes: { [key: string]: AboutPage | MainPage | Start | LoginPage | NotFoundPage}
   private currentPage: Page | undefined
   about: AboutPage
   main: MainPage
-  validation: Validation
+  start: Start
   loginPage: LoginPage | undefined
-
+  isAuth: boolean
+  notFound: NotFoundPage
+ 
   constructor() {
-    window.addEventListener('popstate', () => this.navigate())
+    window.addEventListener('popstate', (event) => {
+      const path = event.state?.path || '/'; 
+      this.navigate(path, 1);
+     });
 
+    this.isAuth = false
     this.about = new AboutPage()
-    this.validation = new Validation()
-    this.loginPage = this.validation.login
-    this.main = this.validation.main
-
+    this.start = new Start()
+    this.loginPage = this.start.login
+    this.main = this.start.main
+    this.notFound = new NotFoundPage()
+    
     this.routes = {
-      '/': this.validation,
+      '/': this.start,
       '/about': this.about,
-      '/login': this.validation,
+      '/login': this.start,
       '/main': this.main,
+      '/404': this.notFound
     }
+       
 
-    this.main.webSocketClient.on('USER_LOGIN', () => this.goToMain())
-    this.main.webSocketClient.on('USER_LOGOUT', () => this.goToLogin())
 
     if (this.loginPage) {
       this.loginPage.bindGoAboutButton(this.goToAbout)
@@ -45,24 +52,69 @@ export class AppRouter {
     }
     this.about.bindMainPage(this.navigateBasedOnSession)
     this.about.bindLoginPage(this.navigateBasedOnSession)
+    
     this.checkSessionAndNavigate()
   }
 
-  navigate(path?: string) {
+
+  checkSessionAndNavigate = () => {
+    const currentPath = window.location.pathname
+      this.isAuth = this.isUserAuth()
+      console.log(this.isAuth)
+    
+        if ( currentPath  === '/login' && this.isAuth) {
+          this.navigate('/main')
+         
+        }
+      if (currentPath === '/about'){
+        this.navigate('/about')
+        
+      }
+      if (!this.isAuth && currentPath === '/main') {
+      this.navigate('/login')
+      
+    } else {
+      this.navigate()
+    }
+  }
+
+  navigate(path?: string, num?: number) {
     if (this.currentPage) {
       this.currentPage.hide()
     }
+    if (!path) {
+      this.navigate('/login');
+      return;
+    }
+   
+   this.isAuth = this.isUserAuth()
 
-    if (path) {
-      window.history.pushState(path, '', path)
-    } else {
-      window.history.replaceState(
-        window.location.pathname,
-        '',
-        window.location.pathname,
-      )
+    if (path === '/login' && this.isAuth || path === '/' && this.isAuth) {
+      this.navigate('/main');
+      return;
     }
 
+    if (path === '/main' && !this.isAuth || path === '/' && !this.isAuth) {
+      this.navigate('/login');
+      return;
+    }
+    if (!num) {
+    if (path) {
+      window.history.pushState({ path }, '', path);
+   } else {
+      window.history.replaceState(
+        { path: window.location.pathname },
+        '',
+        window.location.pathname,
+      );
+   
+    }
+  } else if (num) {
+    if (path) {
+      window.history.replaceState({ path }, '', path);
+   }
+  }
+   
     const currentPath = window.location.pathname
     this.currentPage = this.routes[currentPath] || new NotFoundPage()
     this.currentPage?.init()
@@ -84,30 +136,8 @@ export class AppRouter {
     this.navigate('/about')
   }
 
-  checkSessionAndNavigate = () => {
-    const currentPath = window.location.pathname
-    const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser')
-    if (MrrrChatUserData) {
-      this.main.user = JSON.parse(MrrrChatUserData).firstName
-      this.main.password = JSON.parse(MrrrChatUserData).password
-      if (this.main.user && this.main.password) {
-        if (
-          currentPath === '/' ||
-          currentPath === '/login' ||
-          currentPath === '/main'
-        ) {
-          this.navigate('/main')
-        }
-      } else {
-        this.navigate()
-      }
-    } else if (currentPath === '/main') {
-      this.navigate('/login')
-    } else {
-      this.navigate()
-    }
-  }
-
+  
+  
   navigateBasedOnSession = () => {
     const userData = sessionStorage.getItem('MrrrChatUser')
 
@@ -117,4 +147,16 @@ export class AppRouter {
       this.navigate('/login')
     }
   }
+isUserAuth() {
+  const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser')
+    if (MrrrChatUserData) {
+    this.isAuth = true
+    
+    } else {
+      this.isAuth = false
+    }
+    return  this.isAuth 
 }
+  
+}
+export const router = new AppRouter()

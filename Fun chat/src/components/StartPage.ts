@@ -1,4 +1,4 @@
-import { WebSocketClient } from '../Service/WebSocketClient'
+
 import { showLoader } from '../Utils/loader'
 import { LoginPage } from './LoginPage/LoginPage'
 import { MainPage } from './MainPage/MainPage'
@@ -8,15 +8,14 @@ interface userData {
   password: string
 }
 
-export class Validation {
+export class Start {
   private userAuthData: userData | undefined
 
   user: string | undefined
   main: MainPage
   login: LoginPage
   password: string | undefined
-  // webSocketClient: WebSocketClient = new WebSocketClient('ws://localhost:4000');
-
+  
   constructor() {
     this.login = new LoginPage()
     this.main = new MainPage()
@@ -29,9 +28,8 @@ export class Validation {
       this.login.bindpasswordInput(this.handleErrors)
       this.login.bindSubmit(this.handleSubmit)
     }
-
-    // this.webSocketClient.connect();
-  }
+    
+     }
 
   handleSubmit = (): void => {
     if (

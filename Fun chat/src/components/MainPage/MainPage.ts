@@ -1,6 +1,7 @@
 import { WebSocketClient } from '../../Service/WebSocketClient'
 import { createElement } from '../../Utils/createElement'
 import { showLoader } from '../../Utils/loader'
+import { router } from '../../Router/AppRouter'
 import {
   ActiveUsersList,
   ErrorMessage,
@@ -47,6 +48,11 @@ export class MainPage {
   inactiveUsers: User[] | undefined
   id: string | undefined
   activeChatId: string | undefined
+  reconnectAttempts: number
+  maxReconnectAttempts: number
+  reconnectDelay: number
+  router: import("d:/Julia/AHTML/RS school/Stage 1/St1 2/Fun chat/juliabel5-JSFE2023Q4/Fun chat/src/Router/AppRouter").AppRouter | undefined
+  isOnline: boolean
 
   constructor() {
     this.header = new Header()
@@ -56,10 +62,16 @@ export class MainPage {
     if (!this.webSocketClient.isOpen()) {
       this.webSocketClient.connect()
     }
-    this.setupEventListeners()
-
+    
+    
+    
     this.activeUsers = []
     this.inactiveUsers = []
+    this.reconnectAttempts = 0;
+    this.maxReconnectAttempts = 10;
+    this.reconnectDelay = 5000; 
+    this.setupEventListeners()
+    this.isOnline = false;
   }
 
   init() {
@@ -72,6 +84,8 @@ export class MainPage {
         this.header.nameContainer.textContent = `User name: ${this.user}`
       }
       if (this.webSocketClient.isOpen()) {
+        this.reconnectAttempts = 0;
+        this.isOnline = false
         this.webSocketClient.getAllAuthUsers()
         this.webSocketClient.getAllUnauthUsers()
       }
@@ -156,8 +170,10 @@ export class MainPage {
   }
 
   hide() {
+    console.log('hide')
     if (this.gameArea) {
       this.gameArea.remove()
+      
     }
   }
 
@@ -174,8 +190,8 @@ export class MainPage {
     if (this.user && this.password) {
       this.webSocketClient.logoutUser(this.id, this.user, this.password)
     }
-    sessionStorage.removeItem('MrrrChatUser')
-  }
+
+      }
 
   confirm = () => {
     if (this.toast) {
@@ -187,7 +203,8 @@ export class MainPage {
     this.webSocketClient.on(
       'WEBSOCKET_OPEN',
       this.sendInitialRequests.bind(this),
-    )
+          )
+          console.log("навесили")
   }
 
   sendInitialRequests() {
@@ -206,12 +223,18 @@ export class MainPage {
       'USER_EXTERNAL_LOGOUT',
       this.externalUserLogout.bind(this),
     )
-    if (this.user && this.password) {
+   this.webSocketClient.on('WEBSOCKET_CLOSED', this.reconnect.bind(this))
+   this.router = router
+
+      this.webSocketClient.on('USER_LOGOUT', () => this.router?.goToLogin())
+      this.webSocketClient.on('USER_LOGIN', () => this.router?.goToMain())
+    if (this.user && this.password && !this.isOnline) {
       this.id = this.generateUniqueTimestampID()
       this.webSocketClient.loginUser(this.id, this.user, this.password)
     }
     this.webSocketClient.getAllAuthUsers()
     this.webSocketClient.getAllUnauthUsers()
+    
   }
 
   public generateUniqueTimestampID() {
@@ -219,10 +242,15 @@ export class MainPage {
   }
 
   loginSucces(event: UserLogin) {
+    this.isOnline = true
     console.log('логин прошел успешно')
   }
 
   logoutSucces(event: UserLogout) {
+    this.isOnline = false
+    this.user = ''
+    this.password = ''
+    sessionStorage.removeItem('MrrrChatUser')
     console.log('логаут прошел успешно')
   }
 
@@ -250,4 +278,27 @@ export class MainPage {
     this.webSocketClient.getAllAuthUsers()
     this.webSocketClient.getAllUnauthUsers()
   }
+
+  reconnect() {
+   if ((this.reconnectAttempts < this.maxReconnectAttempts) && !this.webSocketClient.isOpen()) {
+      setTimeout(() => {
+         console.log(`Attempting to reconnect... Attempt ${this.reconnectAttempts + 1}, ${this.reconnectDelay}`);
+      this.webSocketClient.removeAllListeners()
+      this.webSocketClient.on('WEBSOCKET_CLOSED', this.reconnect.bind(this))
+       this.webSocketClient = new WebSocketClient('ws://localhost:4000')
+        this.webSocketClient.connect()
+        this.setupEventListeners()
+        this.webSocketClient.removeListener('WEBSOCKET_CLOSED', this.reconnect.bind(this))
+         this.reconnectAttempts++; 
+     }, this.reconnectDelay);
+   } else {
+    console.log('Max reconnection attempts reached.');
+   }
+
+
 }
+  
+}
+  
+   
+

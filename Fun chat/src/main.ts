@@ -1,5 +1,7 @@
 import './styles.scss'
-import { AppRouter } from './Router/AppRouter'
-import { WebSocketClient } from './Service/WebSocketClient'
+import { router } from './Router/AppRouter'
 
-new AppRouter()
+
+ const appRouter = router
+
+

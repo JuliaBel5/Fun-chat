@@ -34,6 +34,14 @@ export class CustomEventEmitter<T extends EventMap>
       this.events[eventName]!.forEach((listener) => listener(params))
     }
   }
+
+  removeAllListeners(): void {
+     for (const eventName in this.events) {
+      if (this.events.hasOwnProperty(eventName)) {
+        this.events[eventName as keyof T] = [];
+      }
+    }
+ }
 }
 
 export interface EventMap {
@@ -52,6 +60,7 @@ export interface EventMap {
   ERROR: ErrorMessage
   userClicked: User
   WEBSOCKET_OPEN: undefined
+  WEBSOCKET_CLOSED: void
 }
 
 export type EventKey<T> = keyof T
