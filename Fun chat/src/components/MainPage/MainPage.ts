@@ -227,7 +227,7 @@ export class MainPage {
    this.router = router
 
       this.webSocketClient.on('USER_LOGOUT', () => this.router?.goToLogin())
-      this.webSocketClient.on('USER_LOGIN', () => this.router?.goToMain())
+      this.webSocketClient.on('USER_LOGIN', () => this.router?.navigate())
     if (this.user && this.password && !this.isOnline) {
       this.id = this.generateUniqueTimestampID()
       this.webSocketClient.loginUser(this.id, this.user, this.password)

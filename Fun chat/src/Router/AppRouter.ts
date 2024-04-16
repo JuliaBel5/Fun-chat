@@ -45,51 +45,35 @@ export class AppRouter {
 
     if (this.loginPage) {
       this.loginPage.bindGoAboutButton(this.goToAbout)
-      // this.loginPage.bindSubmit(this.goToMain)
+     
     }
     if (this.main.header.goToAbout) {
       this.main.header.bindGoAboutButton(this.goToAbout)
     }
     this.about.bindMainPage(this.navigateBasedOnSession)
     this.about.bindLoginPage(this.navigateBasedOnSession)
-    
-    this.checkSessionAndNavigate()
+
+   this.navigate()
   }
 
 
-  checkSessionAndNavigate = () => {
-    const currentPath = window.location.pathname
-      this.isAuth = this.isUserAuth()
-      console.log(this.isAuth)
-    
-        if ( currentPath  === '/login' && this.isAuth) {
-          this.navigate('/main')
-         
-        }
-      if (currentPath === '/about'){
-        this.navigate('/about')
-        
-      }
-      if (!this.isAuth && currentPath === '/main') {
-      this.navigate('/login')
-      
-    } else {
-      this.navigate()
-    }
-  }
 
   navigate(path?: string, num?: number) {
     if (this.currentPage) {
       this.currentPage.hide()
     }
     if (!path) {
-      this.navigate('/login');
-      return;
-    }
-   
+      const currentPath = window.location.pathname
+      if (this.routes[currentPath]) {
+        this.navigate(currentPath)
+        return
+      }
+}
+
    this.isAuth = this.isUserAuth()
 
     if (path === '/login' && this.isAuth || path === '/' && this.isAuth) {
+      console.log('this case', path)
       this.navigate('/main');
       return;
     }
@@ -98,8 +82,10 @@ export class AppRouter {
       this.navigate('/login');
       return;
     }
-    if (!num) {
+
+      if (!num) {
     if (path) {
+      console.log(11, path)
       window.history.pushState({ path }, '', path);
    } else {
       window.history.replaceState(
@@ -142,8 +128,10 @@ export class AppRouter {
     const userData = sessionStorage.getItem('MrrrChatUser')
 
     if (userData) {
+    
       this.navigate('/main')
     } else {
+    
       this.navigate('/login')
     }
   }

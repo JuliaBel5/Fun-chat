@@ -19,7 +19,14 @@ export class LoginPage {
 
   goToAbout: HTMLButtonElement | undefined
 
-  constructor() {}
+  constructor() {
+    this.goToAbout = createElement(
+      'button',
+      'aboutButton',
+      'Go to About Page',
+      'goToAbout',
+    )
+  }
 
   init(): void {
     this.gameArea = createElement('div', 'gamearea')
@@ -38,12 +45,7 @@ export class LoginPage {
       'loginButton',
     )
 
-    this.goToAbout = createElement(
-      'button',
-      'aboutButton',
-      'Go to About Page',
-      'goToAbout',
-    )
+   
     const buttonContainer = createElement('form', 'inputContainer')
     const leftPanel = createElement('div', 'leftPanel')
     leftPanel.style.cursor = 'pointer'
