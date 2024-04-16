@@ -17,7 +17,7 @@ export class LoginPage {
 
   audio: HTMLAudioElement | undefined
 
-  goToAbout: HTMLButtonElement | undefined
+  goToAbout: HTMLButtonElement 
 
   constructor() {
     this.goToAbout = createElement(
