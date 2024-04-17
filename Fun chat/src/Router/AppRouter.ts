@@ -4,14 +4,16 @@ import { MainPage } from '../components/MainPage/MainPage'
 import { NotFoundPage } from '../components/NotFounPage/NotFoundPage'
 import { Start } from '../components/StartPage'
 
-
 interface Page {
   init(): void
   hide(): void
 }
 
 export class AppRouter {
-  private routes: { [key: string]: AboutPage | MainPage | Start | LoginPage | NotFoundPage}
+  private routes: {
+    [key: string]: AboutPage | MainPage | Start | LoginPage | NotFoundPage
+  }
+
   private currentPage: Page | undefined
   about: AboutPage
   main: MainPage
@@ -19,12 +21,12 @@ export class AppRouter {
   loginPage: LoginPage | undefined
   isAuth: boolean
   notFound: NotFoundPage
- 
+
   constructor() {
     window.addEventListener('popstate', (event) => {
-      const path = event.state?.path || '/'; 
-      this.navigate(path, 1);
-     });
+      const path = event.state?.path || '/'
+      this.navigate(path, 1)
+    })
 
     this.isAuth = false
     this.about = new AboutPage()
@@ -32,20 +34,17 @@ export class AppRouter {
     this.loginPage = this.start.login
     this.main = this.start.main
     this.notFound = new NotFoundPage()
-    
+
     this.routes = {
       '/': this.start,
       '/about': this.about,
       '/login': this.start,
       '/main': this.main,
-      '/404': this.notFound
+      '/404': this.notFound,
     }
-       
-
 
     if (this.loginPage) {
       this.loginPage.bindGoAboutButton(this.goToAbout)
-     
     }
     if (this.main.header.goToAbout) {
       this.main.header.bindGoAboutButton(this.goToAbout)
@@ -53,10 +52,8 @@ export class AppRouter {
     this.about.bindMainPage(this.navigateBasedOnSession)
     this.about.bindLoginPage(this.navigateBasedOnSession)
 
-   this.navigate()
+    this.navigate()
   }
-
-
 
   navigate(path?: string, num?: number) {
     if (this.currentPage) {
@@ -68,42 +65,40 @@ export class AppRouter {
         this.navigate(currentPath)
         return
       }
-}
+    }
 
-   this.isAuth = this.isUserAuth()
+    this.isAuth = this.isUserAuth()
 
-    if (path === '/login' && this.isAuth || path === '/' && this.isAuth) {
+    if ((path === '/login' && this.isAuth) || (path === '/' && this.isAuth)) {
       console.log('this case', path)
-      this.navigate('/main');
-      return;
+      this.navigate('/main')
+      return
     }
 
-    if (path === '/main' && !this.isAuth || path === '/' && !this.isAuth) {
-      this.navigate('/login');
-      return;
+    if ((path === '/main' && !this.isAuth) || (path === '/' && !this.isAuth)) {
+      this.navigate('/login')
+      return
     }
 
-      if (!num) {
-    if (path) {
-      console.log(11, path)
-      window.history.pushState({ path }, '', path);
-   } else {
-      window.history.replaceState(
-        { path: window.location.pathname },
-        '',
-        window.location.pathname,
-      );
-   
+    if (!num) {
+      if (path) {
+        window.history.pushState({ path }, '', path)
+      } else {
+        window.history.replaceState(
+          { path: window.location.pathname },
+          '',
+          window.location.pathname,
+        )
+      }
+    } else if (num) {
+      if (path) {
+        window.history.replaceState({ path }, '', path)
+      }
     }
-  } else if (num) {
-    if (path) {
-      window.history.replaceState({ path }, '', path);
-   }
-  }
-   
+
     const currentPath = window.location.pathname
     this.currentPage = this.routes[currentPath] || new NotFoundPage()
-    this.currentPage?.init()
+    this.currentPage.init()
   }
 
   goTo(path: string) {
@@ -122,29 +117,24 @@ export class AppRouter {
     this.navigate('/about')
   }
 
-  
-  
   navigateBasedOnSession = () => {
     const userData = sessionStorage.getItem('MrrrChatUser')
 
     if (userData) {
-    
       this.navigate('/main')
     } else {
-    
       this.navigate('/login')
     }
   }
-isUserAuth() {
-  const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser')
+
+  isUserAuth() {
+    const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser')
     if (MrrrChatUserData) {
-    this.isAuth = true
-    
+      this.isAuth = true
     } else {
       this.isAuth = false
     }
-    return  this.isAuth 
-}
-  
+    return this.isAuth
+  }
 }
 export const router = new AppRouter()

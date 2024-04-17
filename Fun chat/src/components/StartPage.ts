@@ -1,4 +1,3 @@
-
 import { showLoader } from '../Utils/loader'
 import { LoginPage } from './LoginPage/LoginPage'
 import { MainPage } from './MainPage/MainPage'
@@ -15,7 +14,7 @@ export class Start {
   main: MainPage
   login: LoginPage
   password: string | undefined
-  
+
   constructor() {
     this.login = new LoginPage()
     this.main = new MainPage()
@@ -28,8 +27,7 @@ export class Start {
       this.login.bindpasswordInput(this.handleErrors)
       this.login.bindSubmit(this.handleSubmit)
     }
-    
-     }
+  }
 
   handleSubmit = (): void => {
     if (

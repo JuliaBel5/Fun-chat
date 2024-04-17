@@ -1,7 +1,7 @@
-import { WebSocketClient } from '../../Service/WebSocketClient'
+import { router } from '../../Router/AppRouter'
+import ws, { WebSocketClient } from '../../Service/WebSocketClient'
 import { createElement } from '../../Utils/createElement'
 import { showLoader } from '../../Utils/loader'
-import { router } from '../../Router/AppRouter'
 import {
   ActiveUsersList,
   ErrorMessage,
@@ -40,7 +40,7 @@ export class MainPage {
   toast: Toast = new Toast()
   login: string | undefined
 
-  webSocketClient: WebSocketClient = new WebSocketClient('ws://localhost:4000')
+  webSocketClient: WebSocketClient = ws //new WebSocketClient('ws://localhost:4000')
   password: string | undefined
   startChatPanel: HTMLDivElement | undefined
   userList: UserList | undefined
@@ -48,10 +48,10 @@ export class MainPage {
   inactiveUsers: User[] | undefined
   id: string | undefined
   activeChatId: string | undefined
-  reconnectAttempts: number
-  maxReconnectAttempts: number
-  reconnectDelay: number
-  router: import("d:/Julia/AHTML/RS school/Stage 1/St1 2/Fun chat/juliabel5-JSFE2023Q4/Fun chat/src/Router/AppRouter").AppRouter | undefined
+  router:
+    | import('d:/Julia/AHTML/RS school/Stage 1/St1 2/Fun chat/juliabel5-JSFE2023Q4/Fun chat/src/Router/AppRouter').AppRouter
+    | undefined
+
   isOnline: boolean
 
   constructor() {
@@ -62,16 +62,11 @@ export class MainPage {
     if (!this.webSocketClient.isOpen()) {
       this.webSocketClient.connect()
     }
-    
-    
-    
+
     this.activeUsers = []
     this.inactiveUsers = []
-    this.reconnectAttempts = 0;
-    this.maxReconnectAttempts = 10;
-    this.reconnectDelay = 5000; 
     this.setupEventListeners()
-    this.isOnline = false;
+    this.isOnline = false
   }
 
   init() {
@@ -84,7 +79,6 @@ export class MainPage {
         this.header.nameContainer.textContent = `User name: ${this.user}`
       }
       if (this.webSocketClient.isOpen()) {
-        this.reconnectAttempts = 0;
         this.isOnline = false
         this.webSocketClient.getAllAuthUsers()
         this.webSocketClient.getAllUnauthUsers()
@@ -170,10 +164,8 @@ export class MainPage {
   }
 
   hide() {
-    console.log('hide')
     if (this.gameArea) {
       this.gameArea.remove()
-      
     }
   }
 
@@ -190,8 +182,7 @@ export class MainPage {
     if (this.user && this.password) {
       this.webSocketClient.logoutUser(this.id, this.user, this.password)
     }
-
-      }
+  }
 
   confirm = () => {
     if (this.toast) {
@@ -203,8 +194,8 @@ export class MainPage {
     this.webSocketClient.on(
       'WEBSOCKET_OPEN',
       this.sendInitialRequests.bind(this),
-          )
-          console.log("навесили")
+    )
+    console.log('навесили')
   }
 
   sendInitialRequests() {
@@ -223,18 +214,17 @@ export class MainPage {
       'USER_EXTERNAL_LOGOUT',
       this.externalUserLogout.bind(this),
     )
-   this.webSocketClient.on('WEBSOCKET_CLOSED', this.reconnect.bind(this))
-   this.router = router
+    // this.webSocketClient.on('WEBSOCKET_CLOSED', this.reconnect.bind(this))
+    this.router = router
 
-      this.webSocketClient.on('USER_LOGOUT', () => this.router?.goToLogin())
-      this.webSocketClient.on('USER_LOGIN', () => this.router?.navigate())
+    this.webSocketClient.on('USER_LOGOUT', () => this.router?.goToLogin())
+    this.webSocketClient.on('USER_LOGIN', () => this.router?.navigate())
     if (this.user && this.password && !this.isOnline) {
       this.id = this.generateUniqueTimestampID()
       this.webSocketClient.loginUser(this.id, this.user, this.password)
     }
     this.webSocketClient.getAllAuthUsers()
     this.webSocketClient.getAllUnauthUsers()
-    
   }
 
   public generateUniqueTimestampID() {
@@ -280,7 +270,7 @@ export class MainPage {
   }
 
   reconnect() {
-   if ((this.reconnectAttempts < this.maxReconnectAttempts) && !this.webSocketClient.isOpen()) {
+    /*  if ((this.reconnectAttempts < this.maxReconnectAttempts) && !this.webSocketClient.isOpen()) {
       setTimeout(() => {
          console.log(`Attempting to reconnect... Attempt ${this.reconnectAttempts + 1}, ${this.reconnectDelay}`);
       this.webSocketClient.removeAllListeners()
@@ -293,12 +283,6 @@ export class MainPage {
      }, this.reconnectDelay);
    } else {
     console.log('Max reconnection attempts reached.');
-   }
-
-
+   }*/
+  }
 }
-  
-}
-  
-   
-

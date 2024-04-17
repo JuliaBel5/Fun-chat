@@ -36,12 +36,15 @@ export class CustomEventEmitter<T extends EventMap>
   }
 
   removeAllListeners(): void {
-     for (const eventName in this.events) {
-      if (this.events.hasOwnProperty(eventName)) {
-        this.events[eventName as keyof T] = [];
+    for (const eventName in this.events) {
+      if (
+        this.events.hasOwnProperty(eventName) &&
+        eventName !== 'WEBSOCKET_OPEN'
+      ) {
+        this.events[eventName as keyof T] = []
       }
     }
- }
+  }
 }
 
 export interface EventMap {

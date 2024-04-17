@@ -17,7 +17,7 @@ export class LoginPage {
 
   audio: HTMLAudioElement | undefined
 
-  goToAbout: HTMLButtonElement 
+  goToAbout: HTMLButtonElement
 
   constructor() {
     this.goToAbout = createElement(
@@ -45,7 +45,6 @@ export class LoginPage {
       'loginButton',
     )
 
-   
     const buttonContainer = createElement('form', 'inputContainer')
     const leftPanel = createElement('div', 'leftPanel')
     leftPanel.style.cursor = 'pointer'

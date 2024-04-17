@@ -11,14 +11,15 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
   reconnectAttempts: number
   maxReconnectAttempts: number
   reconnectDelay: number
+  timeout = -1
 
   constructor(private url: string) {
     super()
     this.socket = new WebSocket(url)
     this.url = url
-    this.reconnectAttempts = 0;
-    this.maxReconnectAttempts = 10;
-    this.reconnectDelay = 3000; 
+    this.reconnectAttempts = 0
+    this.maxReconnectAttempts = 10
+    this.reconnectDelay = 5000
   }
 
   public isOpen(): boolean {
@@ -26,47 +27,53 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
   }
 
   connect(): void {
-    this.socket.addEventListener('open', () => {
-      console.log('Connected to WebSocket server')
-      this.emit('WEBSOCKET_OPEN', undefined)
-      this.reconnectAttempts = 0;
-      this.reconnectDelay = 3000;
-    })
-
-    this.socket.onmessage = (event) => {
-      console.log('Message from server:', event.data)
-      const message = JSON.parse(event.data)
-      if (message.type === 'ERROR') {
-        this.toast.showNotification(message.payload.error)
-      } else {
-        this.emit(message.type, message)
-      }
-
-      this.socket.onerror = (event) => {
-        console.error('WebSocket error:', event)
-      }
-
-      this.socket.addEventListener('close', (event) => {
-        console.log('WebSocket connection closed:', event)
-                this.emit('WEBSOCKET_CLOSED', undefined)
-        
-      })
-    }
-    
+    this.socket.addEventListener('open', this.handleOpen)
+    this.socket.addEventListener('message', this.handleMessage)
+    this.socket.addEventListener('error', this.handleError)
+    this.socket.addEventListener('close', this.handleClose)
   }
-  public reconnect() {
 
-//    if (this.reconnectAttempts < this.maxReconnectAttempts) {
- //     setTimeout(() => {
-         console.log(`Attempting to reconnect... Attempt ${this.reconnectAttempts + 1}, ${this.reconnectDelay}`);
-         this.socket = new WebSocket(this.url)
-         this.connect();
-         this.reconnectAttempts++; 
-//       }, this.reconnectDelay);
-//    } else {
-//       console.log('Max reconnection attempts reached.');
-//    }
-   }
+  handleOpen = (event: Event) => {
+    console.log('добавил на Опен')
+    console.log('Connected to WebSocket server')
+    this.emit('WEBSOCKET_OPEN', undefined)
+    this.reconnectAttempts = 0
+  }
+
+  handleMessage = (event: MessageEvent) => {
+    console.log('Message from server:', event.data)
+    const message = JSON.parse(event.data)
+    if (message.type === 'ERROR') {
+      this.toast.showNotification(message.payload.error)
+    } else {
+      this.emit(message.type, message)
+    }
+  }
+
+  handleClose = (event: CloseEvent) => {
+    console.log('WebSocket connection closed:', event)
+    this.reconnect()
+    this.emit('WEBSOCKET_CLOSED', undefined)
+  }
+
+  handleError = (event: Event) => {
+    console.error('WebSocket error:', event)
+  }
+
+  public reconnect() {
+    console.log(
+      `Attempting to reconnect... Attempt ${this.reconnectAttempts + 1}`,
+    )
+    this.socket.removeEventListener('open', this.handleOpen)
+    this.socket.removeEventListener('message', this.handleMessage)
+    this.socket.removeEventListener('close', this.handleClose)
+    this.socket.removeEventListener('error', this.handleError)
+    this.removeAllListeners()
+    this.socket = new WebSocket(this.url)
+    this.connect()
+    this.reconnectAttempts++
+  }
+
   public loginUser(id = '', login: string, password: string): void {
     console.log('Выслал запрос на логин', login)
     const loginRequest = {
@@ -129,6 +136,8 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
     }
   }
 }
+const ws = new WebSocketClient('ws://localhost:4000')
+export default ws
 
 interface ActiveUsersList {
   id: string
