@@ -4,23 +4,9 @@ type HandlerFunction = () => void
 
 export class Header {
   logout: HTMLDivElement | undefined
-
   header: HTMLElement
-
-  backgroundTip: HTMLElement | undefined
-
-  audioTip: HTMLElement | undefined
-
-  translationTip: HTMLElement | undefined
-
-  levelSelect: HTMLSelectElement | undefined
-
-  roundSelect: HTMLSelectElement | undefined
-
   catElement: HTMLImageElement | undefined
-
   audio: HTMLAudioElement
-
   goToAbout: HTMLButtonElement | undefined
   nameContainer: HTMLDivElement | undefined
   titleContainer: HTMLDivElement | undefined

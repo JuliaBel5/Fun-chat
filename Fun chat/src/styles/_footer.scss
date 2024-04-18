@@ -2,8 +2,7 @@
 @import './mixins';
 @import url('https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Lobster&family=Tillana:wght@400;500;600;700;800&display=swap');
 
-.header {
-
+.footer {
   display: flex;
   justify-content: space-between;
   width: 100%;
@@ -15,57 +14,39 @@
   margin-top: 10px;
 }
 
-.name-container {
+.schoolname-container {
   display: flex;
   justify-content: flex-start;
   align-items: center;
   height: 50px;
-  width: 250px;
+  width: 100px;
   font-family: 'Tillana', system-ui;
   font-size: 24px;
   gap: 10px;
 
 }
 
-
-
-.mini-cat {
-  height: 75px;
-  cursor: pointer;
-  display: inline-block;
-  margin-right: 20px;
+.school-logo {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background-image: url('RSSchool.png');
+  background-size: cover;
+  height: 30px;
+  width: 30px;
+  font-family: 'Tillana', system-ui;
+  font-size: 24px;
+  gap: 10px;
 }
 
-.title-container {
-  height: 50px;
+.school-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70px;
   width: 250px;
   font-family: 'Tillana', system-ui;
   font-size: 24px;
   color: rgb(56, 12, 98);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.icon-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 70px;
-  gap: 20px;
-}
-
-.header-button {
-  @include startButton;
-  margin-top: 5px;
-  width: 200px;
-}
-
-.logout {
-  width: 70px;
-  height: 70px;
-  cursor: pointer;
-  background-image: url('logout.png');
-  background-size: cover;
+  gap: 5px;
 }

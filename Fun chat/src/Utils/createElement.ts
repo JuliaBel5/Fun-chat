@@ -37,3 +37,33 @@ export function createInputElement<T extends keyof HTMLElementTagNameMap>(
   }
   return element
 }
+
+export function createLinkedImage(
+  tag: string,
+  className: string,
+  href: string,
+  image: string,
+): HTMLElement {
+  const element = document.createElement(tag)
+  element.className = className
+  if (element && element instanceof HTMLImageElement) {
+    element.src = image
+  }
+  const link = document.createElement('a')
+  link.href = href
+  link.append(element)
+  return link
+}
+
+export function createLinkedElement(
+  tag: string,
+  className: string,
+  href: string,
+): HTMLElement {
+  const element = document.createElement(tag)
+  element.className = className
+  const link = document.createElement('a')
+  link.href = href
+  link.append(element)
+  return link
+}

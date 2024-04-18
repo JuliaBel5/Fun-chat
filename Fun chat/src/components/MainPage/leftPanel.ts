@@ -12,6 +12,11 @@ export class UserList extends CustomEventEmitter<EventMap> {
     super()
     this.leftInputContainer = createElement('div', 'search-container')
     this.leftInput = createElement('input', 'left-input', '')
+    this.leftInput.addEventListener('input', () => {
+      const searchValue = this.leftInput.value.toLowerCase()
+      this.filterUsers(searchValue)
+    })
+
     this.usersContainer = createElement('div', 'users-container')
     this.leftInputContainer.append(this.leftInput, this.usersContainer)
     const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser')
@@ -21,16 +26,35 @@ export class UserList extends CustomEventEmitter<EventMap> {
     this.usersList = []
   }
 
+  private filterUsers(searchValue: string): void {
+    const filteredUsers = this.usersList.filter((userWrapper) => {
+      const userLogin = userWrapper
+        .querySelector('.user-status')
+        ?.textContent?.toLowerCase()
+      return userLogin?.includes(searchValue)
+    })
+
+    this.usersContainer.innerHTML = ''
+
+    filteredUsers.forEach((userWrapper) => {
+      this.usersContainer.append(userWrapper)
+    })
+  }
+
   public updateActiveUsersList(users: User[]): void {
     if (this.usersContainer) {
       this.usersContainer.innerHTML = ''
+      this.usersList = []
       const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser')
       if (MrrrChatUserData) {
         this.user = JSON.parse(MrrrChatUserData).firstName
+        console.log('leftpanel', MrrrChatUserData, this.user)
       }
+
       users.forEach((user) => {
         if (user.login !== this.user) {
-          this.addUser(user)
+          const wrappedUser = this.addUser(user)
+          this.usersList.push(wrappedUser)
         }
       })
     }
@@ -43,7 +67,8 @@ export class UserList extends CustomEventEmitter<EventMap> {
     }
     users.forEach((user) => {
       if (user.login !== this.user) {
-        this.addUser(user)
+        const wrappedUser = this.addUser(user)
+        this.usersList.push(wrappedUser)
       }
     })
   }
@@ -58,5 +83,6 @@ export class UserList extends CustomEventEmitter<EventMap> {
     })
     userWrapper.append(statusCircle, userDiv)
     this.usersContainer.append(userWrapper)
+    return userWrapper
   }
 }

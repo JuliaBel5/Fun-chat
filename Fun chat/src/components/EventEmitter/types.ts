@@ -7,7 +7,10 @@ export interface ThirdPartyUserLogin {
   id: null
   type: 'USER_EXTERNAL_LOGIN'
   payload: {
-    users: User[]
+    user: {
+      login: string
+      isLogined: boolean
+    }
   }
 }
 
@@ -15,7 +18,10 @@ export interface ThirdPartyUserLogout {
   id: null
   type: 'USER_EXTERNAL_LOGOUT'
   payload: {
-    users: User[]
+    user: {
+      login: string
+      isLogined: boolean
+    }
   }
 }
 

@@ -1,8 +1,8 @@
-import { showLoader } from '../Utils/loader'
+import { Loader } from './Loader'
 import { LoginPage } from './LoginPage/LoginPage'
 import { MainPage } from './MainPage/MainPage'
 
-interface userData {
+export interface userData {
   firstName: string
   password: string
 }
@@ -14,10 +14,12 @@ export class Start {
   main: MainPage
   login: LoginPage
   password: string | undefined
+  loader: Loader
 
   constructor() {
     this.login = new LoginPage()
     this.main = new MainPage()
+    this.loader = new Loader()
   }
 
   init() {
@@ -47,14 +49,17 @@ export class Start {
       this.userAuthData.password = passwordValue
       this.user = firstNameValue
       this.main.user = firstNameValue
+      this.main.password = passwordValue
 
       if (this.main.userList) {
         this.main.userList.user = firstNameValue
+        console.log('this.main.userList.user', this.main.userList.user)
         this.password = passwordValue
         sessionStorage.setItem(
-          'MrrrChatUser',
+          'MrrrChatTempUser',
           JSON.stringify(this.userAuthData),
         )
+        console.log('start', this.user, this.password)
         this.main.id = this.main.generateUniqueTimestampID()
         if (this.user && this.password) {
           this.main.webSocketClient.loginUser(
@@ -63,6 +68,8 @@ export class Start {
             this.password,
           )
         }
+        this.loader.init()
+        this.loader.showLoader(3000)
       }
     }
   }

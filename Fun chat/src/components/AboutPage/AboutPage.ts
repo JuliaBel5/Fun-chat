@@ -17,11 +17,7 @@ export class AboutPage {
     document.body.append(this.gameArea)
     const container = createElement('div', 'startContainer')
 
-    const welcome = createElement(
-      'p',
-      'welcomeMessage',
-      `Welcome to MrrrrrChat!`,
-    )
+    const welcome = createElement('p', 'welcomeMessage', `Welcome to MrrrChat!`)
 
     const leftPanel = createElement('div', 'leftStartPanel')
     leftPanel.style.cursor = 'pointer'

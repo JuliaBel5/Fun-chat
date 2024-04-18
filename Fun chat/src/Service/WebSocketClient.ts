@@ -34,7 +34,6 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
   }
 
   handleOpen = (event: Event) => {
-    console.log('добавил на Опен')
     console.log('Connected to WebSocket server')
     this.emit('WEBSOCKET_OPEN', undefined)
     this.reconnectAttempts = 0
@@ -47,13 +46,14 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
       this.toast.showNotification(message.payload.error)
     } else {
       this.emit(message.type, message)
+      console.log(message.type, message)
     }
   }
 
   handleClose = (event: CloseEvent) => {
     console.log('WebSocket connection closed:', event)
-    this.reconnect()
     this.emit('WEBSOCKET_CLOSED', undefined)
+    this.reconnect()
   }
 
   handleError = (event: Event) => {
@@ -119,6 +119,33 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
       id: '',
       type: 'USER_INACTIVE',
       payload: null,
+    }
+    this.socket.send(JSON.stringify(request))
+  }
+
+  public sendMessage(id: string, user: string, message: string): void {
+    const request = {
+      id,
+      type: 'MSG_SEND',
+      payload: {
+        message: {
+          to: user,
+          text: message,
+        },
+      },
+    }
+    this.socket.send(JSON.stringify(request))
+  }
+
+  public getHistory(id: string, user: string): void {
+    const request = {
+      id,
+      type: 'MSG_FROM_USER',
+      payload: {
+        user: {
+          login: user,
+        },
+      },
     }
     this.socket.send(JSON.stringify(request))
   }

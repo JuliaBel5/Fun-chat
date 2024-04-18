@@ -38,7 +38,8 @@ export class Toast {
   public show = (message: string, duration = 3000): void => {
     this.toastContainer.classList.add('show')
     this.toast.textContent = message
-
+    this.confirmButton.style.display = 'flex'
+    this.cancelButton.style.display = 'flex'
     this.timeoutId = setTimeout(() => {
       this.toastContainer.classList.remove('show')
     }, duration)
@@ -47,6 +48,7 @@ export class Toast {
   public showNotification = (message: string, duration = 3000): void => {
     this.toastContainer.classList.add('show')
     this.toast.textContent = message
+    this.toast.style.textAlign = 'center'
     this.cancelButton.style.display = 'none'
     this.confirmButton.style.display = 'none'
     this.timeoutId = setTimeout(() => {
@@ -58,6 +60,7 @@ export class Toast {
     this.confirmButton.addEventListener('click', () => {
       this.audio.src = 'click.mp3'
       this.audio.play()
+      this.toastContainer.classList.remove('show')
       handler()
     })
 }

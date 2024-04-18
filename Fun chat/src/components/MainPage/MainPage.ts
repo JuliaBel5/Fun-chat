@@ -1,7 +1,6 @@
 import { router } from '../../Router/AppRouter'
 import ws, { WebSocketClient } from '../../Service/WebSocketClient'
 import { createElement } from '../../Utils/createElement'
-import { showLoader } from '../../Utils/loader'
 import {
   ActiveUsersList,
   ErrorMessage,
@@ -20,7 +19,10 @@ import {
   UserLogin,
   UserLogout,
 } from '../EventEmitter/types'
+import { Loader } from '../Loader'
+import { userData } from '../StartPage'
 import { Toast } from '../toast'
+import { Footer } from './footer'
 import { Header } from './header'
 import { UserList } from './leftPanel'
 
@@ -53,10 +55,14 @@ export class MainPage {
     | undefined
 
   isOnline: boolean
+  userAuthData: userData = { firstName: '', password: '' }
+  footer: Footer = new Footer()
+  loader: any
 
   constructor() {
     this.header = new Header()
     this.header.bindLogout(this.confirm)
+    this.loader = new Loader()
     this.userList = new UserList()
     this.toast.bindConfirmButton(this.logout)
     if (!this.webSocketClient.isOpen()) {
@@ -74,12 +80,15 @@ export class MainPage {
     if (MrrrChatUserData) {
       this.user = JSON.parse(MrrrChatUserData).firstName
       this.password = JSON.parse(MrrrChatUserData).password
+      this.userAuthData.firstName = JSON.parse(MrrrChatUserData).firstName
+      this.userAuthData.firstName = JSON.parse(MrrrChatUserData).password
 
       if (this.header.nameContainer) {
         this.header.nameContainer.textContent = `User name: ${this.user}`
       }
       if (this.webSocketClient.isOpen()) {
         this.isOnline = false
+        this.loader.hideLoader()
         this.webSocketClient.getAllAuthUsers()
         this.webSocketClient.getAllUnauthUsers()
       }
@@ -94,7 +103,7 @@ export class MainPage {
     this.gameArea.append(this.header.header)
 
     this.container = createElement('div', 'game-container')
-    this.gameArea.append(this.container)
+    this.gameArea.append(this.container, this.footer.footer)
     this.leftPanel = createElement('div', 'left-panel')
     this.rightPanel = createElement('div', 'right-panel')
 
@@ -171,9 +180,16 @@ export class MainPage {
 
   sendMessage() {
     if (this.activeChat && this.mainInput) {
-      const messageElement = document.createElement('div')
+      const messageElement = createElement('div')
       messageElement.textContent = this.mainInput.value
       this.activeChat.append(messageElement)
+      if (this.id && this.activeChatId) {
+        this.webSocketClient.sendMessage(
+          this.id,
+          this.activeChatId,
+          this.mainInput.value,
+        )
+      }
       this.mainInput.value = ''
     }
   }
@@ -214,11 +230,14 @@ export class MainPage {
       'USER_EXTERNAL_LOGOUT',
       this.externalUserLogout.bind(this),
     )
-    // this.webSocketClient.on('WEBSOCKET_CLOSED', this.reconnect.bind(this))
+    this.webSocketClient.on('WEBSOCKET_CLOSED', this.reconnect.bind(this))
     this.router = router
 
     this.webSocketClient.on('USER_LOGOUT', () => this.router?.goToLogin())
     this.webSocketClient.on('USER_LOGIN', () => this.router?.navigate())
+
+    this.webSocketClient.on('MSG_SEND', this.receiveMessage.bind(this))
+
     if (this.user && this.password && !this.isOnline) {
       this.id = this.generateUniqueTimestampID()
       this.webSocketClient.loginUser(this.id, this.user, this.password)
@@ -233,6 +252,15 @@ export class MainPage {
 
   loginSucces(event: UserLogin) {
     this.isOnline = true
+    const MrrrChatTempUserData = sessionStorage.getItem('MrrrChatTempUser')
+    if (MrrrChatTempUserData) {
+      this.userAuthData.firstName = JSON.parse(MrrrChatTempUserData).firstName
+      this.userAuthData.password = JSON.parse(MrrrChatTempUserData).password
+      this.user = JSON.parse(MrrrChatTempUserData).firstName
+      this.password = JSON.parse(MrrrChatTempUserData).password
+      sessionStorage.setItem('MrrrChatUser', JSON.stringify(this.userAuthData))
+    }
+    sessionStorage.removeItem('MrrrChatTempUser')
     console.log('логин прошел успешно')
   }
 
@@ -259,17 +287,28 @@ export class MainPage {
   }
 
   externalUserLogin(event: ThirdPartyUserLogin) {
-    //const newLoggedInUser = event.payload.users[0]
+    const newLoggedInUser = event.payload.user.login
+    this.toast.showNotification(`${newLoggedInUser} has just logged in`)
     this.webSocketClient.getAllAuthUsers()
     this.webSocketClient.getAllUnauthUsers()
   }
 
   externalUserLogout(event: ThirdPartyUserLogout) {
+    const newLoggedInUser = event.payload.user.login
+    this.toast.showNotification(`${newLoggedInUser} has just logged out`)
     this.webSocketClient.getAllAuthUsers()
     this.webSocketClient.getAllUnauthUsers()
   }
 
+  receiveMessage(event: MessageSentFromUser | MessageSent) {
+    if (!this.activeChat) return
+    const messageElement = createElement('div')
+    messageElement.textContent = event.payload.message.text
+  }
+
   reconnect() {
+    this.loader.init()
+    this.loader.showLoader(10000, 'Loading...')
     /*  if ((this.reconnectAttempts < this.maxReconnectAttempts) && !this.webSocketClient.isOpen()) {
       setTimeout(() => {
          console.log(`Attempting to reconnect... Attempt ${this.reconnectAttempts + 1}, ${this.reconnectDelay}`);

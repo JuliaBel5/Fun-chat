@@ -131,7 +131,29 @@
   border-radius: 50%;
   width: 120px;
   height: 120px;
+  z-index: 10;
   background-image: url('loader2.png');
   background-size: cover;
   animation: spin 2s linear infinite;
+}
+
+.loading-overlay {
+  display: block;
+  background: rgba(26, 26, 26, 0.3);
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  top: 0;
+}
+
+.title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Tillana', system-ui;
+  color: $greenBook;
+  font-size: 28px;
+  font-weight: 600;
+
 }
