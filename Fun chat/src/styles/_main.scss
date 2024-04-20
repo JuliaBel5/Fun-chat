@@ -114,6 +114,16 @@
   overflow-y: scroll;
 }
 
+.time-of-sending {
+  width: 45%;
+  font-size: 12px;
+}
+
+.sender {
+  width: 45%;
+  font-size: 12px;
+}
+
 .main-input {
   margin: 10px 0;
   height: 35px;
@@ -147,6 +157,8 @@
   border-radius: 7px;
   border: 0.5px solid rgb(17, 90, 154);
   background: rgba(126, 167, 218, 0.5);
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .new-messages {

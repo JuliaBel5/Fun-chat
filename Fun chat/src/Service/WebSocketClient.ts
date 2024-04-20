@@ -46,7 +46,9 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
       console.log(message.type, message)
     } else if (
       message.type === 'USER_ACTIVE' ||
-      message.type === 'USER_INACTIVE'
+      message.type === 'USER_INACTIVE' ||
+      message.type === 'MSG_READ' ||
+      message.type === 'MSG_SEND'
     ) {
       this.emit(message.type, message)
     } else {
