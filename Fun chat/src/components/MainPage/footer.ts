@@ -45,7 +45,7 @@ export class Footer {
       this.audio.play()
     })
     this.titleContainer = createElement('div', 'school-container', '2024')
-    this.schoolContainer.append(this.nameContainer, this.schoolLogo)
+    this.schoolContainer.append(this.schoolLogo, this.nameContainer)
     this.footer.append(
       this.schoolContainer,
       this.catElement,

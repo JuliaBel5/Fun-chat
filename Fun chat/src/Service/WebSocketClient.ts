@@ -40,10 +40,15 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
   }
 
   handleMessage = (event: MessageEvent) => {
-    console.log('Message from server:', event.data)
     const message = JSON.parse(event.data)
     if (message.type === 'ERROR') {
       this.toast.showNotification(message.payload.error)
+      console.log(message.type, message)
+    } else if (
+      message.type === 'USER_ACTIVE' ||
+      message.type === 'USER_INACTIVE'
+    ) {
+      this.emit(message.type, message)
     } else {
       this.emit(message.type, message)
       console.log(message.type, message)
@@ -150,6 +155,19 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
     this.socket.send(JSON.stringify(request))
   }
 
+  public markMessageAsRead(id: string, messageId: string): void {
+    const request = {
+      id: id,
+      type: 'MSG_READ',
+      payload: {
+        message: {
+          id: messageId,
+        },
+      },
+    }
+
+    this.socket.send(JSON.stringify(request))
+  }
   public removeListener(
     eventName: keyof EventMap,
     listener: EventReceiver<EventMap[keyof EventMap]>,

@@ -98,7 +98,7 @@ export interface HistoryOfMessages {
   id: string
   type: 'MSG_FROM_USER'
   payload: {
-    messages: []
+    messages: Message []
   }
 }
 
@@ -175,3 +175,23 @@ export interface ErrorMessage {
     error: 'incorrect payload parameters'
   }
 }
+
+export type MessageStatus = {
+  isDelivered: boolean;
+  isEdited: boolean;
+  isReaded: boolean;
+ };
+ 
+ export type Message = {
+  datetime: number;
+  from: string;
+  id: string;
+  status: MessageStatus;
+  text: string;
+  to: string;
+ };
+
+ export type UnreadUserMessages = {
+  login: string
+  newMessages: string[]
+ }

@@ -1,6 +1,6 @@
 import { createElement } from '../../Utils/createElement'
 import { CustomEventEmitter, EventMap } from '../EventEmitter/EventEmitter'
-import { User } from '../EventEmitter/types'
+import { UnreadUserMessages, User } from '../EventEmitter/types'
 
 export class UserList extends CustomEventEmitter<EventMap> {
   leftInputContainer: HTMLDivElement
@@ -8,6 +8,7 @@ export class UserList extends CustomEventEmitter<EventMap> {
   usersContainer: HTMLDivElement
   user: string | undefined
   usersList: HTMLElement[]
+  userMessages: UnreadUserMessages[] = []
   constructor() {
     super()
     this.leftInputContainer = createElement('div', 'search-container')
@@ -48,12 +49,12 @@ export class UserList extends CustomEventEmitter<EventMap> {
       const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser')
       if (MrrrChatUserData) {
         this.user = JSON.parse(MrrrChatUserData).firstName
-        console.log('leftpanel', MrrrChatUserData, this.user)
       }
 
       users.forEach((user) => {
         if (user.login !== this.user) {
           const wrappedUser = this.addUser(user)
+          this.updateUserMessages(user)
           this.usersList.push(wrappedUser)
         }
       })
@@ -68,9 +69,11 @@ export class UserList extends CustomEventEmitter<EventMap> {
     users.forEach((user) => {
       if (user.login !== this.user) {
         const wrappedUser = this.addUser(user)
+        this.updateUserMessages(user)
         this.usersList.push(wrappedUser)
       }
     })
+    console.log(this.userMessages)
   }
 
   addUser(user: User) {
@@ -79,10 +82,55 @@ export class UserList extends CustomEventEmitter<EventMap> {
     const statusCircle = createElement('span', 'status')
     statusCircle.style.backgroundColor = user.isLogined ? 'green' : 'red'
     userWrapper.addEventListener('click', () => {
+      console.log('user for event userClicked', user.login)
       this.emit('userClicked', user)
     })
     userWrapper.append(statusCircle, userDiv)
     this.usersContainer.append(userWrapper)
+
     return userWrapper
+  }
+
+  updateUserMessages(user: User) {
+    const existingUser = this.userMessages.find(
+      (u) => u.login === user.login && u.newMessages.length === 0,
+    )
+    if (!existingUser) {
+      this.userMessages.push({
+        login: user.login,
+        newMessages: [],
+      })
+    }
+  }
+
+  updateUnreadMessagesNumber() {
+    this.usersList.forEach((userWrapper) => {
+      const userLogin = userWrapper.querySelector('.user-status')?.textContent
+      if (userLogin) {
+        const user = this.userMessages.find((u) => u.login === userLogin)
+        if (user) {
+          let newMessagesElement = userWrapper.querySelector('.new-messages')
+
+          if (
+            user.newMessages.length === 0 &&
+            newMessagesElement &&
+            newMessagesElement instanceof HTMLElement
+          ) {
+            newMessagesElement.style.display = 'none'
+          } else if (user.newMessages.length > 0 && !newMessagesElement) {
+            newMessagesElement = createElement('span', 'new-messages')
+            newMessagesElement.textContent = user.newMessages.length.toString()
+            userWrapper.append(newMessagesElement)
+          } else if (
+            user.newMessages.length > 0 &&
+            newMessagesElement &&
+            newMessagesElement instanceof HTMLElement
+          ) {
+            newMessagesElement.textContent = user.newMessages.length.toString()
+            newMessagesElement.style.display = 'inline'
+          }
+        }
+      }
+    })
   }
 }

@@ -45,6 +45,19 @@ export class CustomEventEmitter<T extends EventMap>
       }
     }
   }
+
+  removeWEBSOCKET_OPENeventListener(): void {
+    for (const eventName in this.events) {
+      if (
+        this.events.hasOwnProperty(eventName) &&
+        eventName === 'WEBSOCKET_OPEN'
+      ) {
+        console.log(this.events[eventName as keyof T])
+        this.events[eventName as keyof T] = []
+      }
+    }
+  }
+
 }
 
 export interface EventMap {
