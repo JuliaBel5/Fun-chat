@@ -1,0 +1,11 @@
+@import './variables';
+@import './mixins';
+@import url('https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Lobster&family=Tillana:wght@400;500;600;700;800&display=swap');
+
+.message-to-user {
+  width: 95%;
+  color: $greenBook;
+  font-size: 16px;
+  margin-bottom: 20px;
+  text-align: justify;
+}

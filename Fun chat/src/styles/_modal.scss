@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+@import './variables';
+@import './mixins';
+
+.modal-button {
+  font-family: Arial, sans-serif;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  background: linear-gradient(to right,
+      rgba(178, 219, 235, 0.4),
+      rgba(40, 72, 113, 0.4));
+
+  color: rgb(89, 27, 35);
+  padding: 5px 10px;
+  border-radius: 10px;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid $redBook;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.modal-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(to left,
+      rgba(178, 235, 212, 0.4),
+      rgba(111, 242, 129, 0.4));
+  color: rgb(235, 241, 44);
+}
+
+.modal {
+  display: none;
+  position: absolute;
+  border-radius: 10px;
+  left: -15%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  background-color: rgba(153, 153, 147, 0.7);
+  border: 2px solid $modalBorderPink;
+  border-radius: 10px;
+  padding: 5px;
+  z-index: 15;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}

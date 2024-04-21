@@ -25,6 +25,7 @@ import { Loader } from '../Loader'
 import { userData } from '../StartPage'
 import { Toast } from '../toast'
 import { ActiveChat } from './ActiveChat'
+import { MessageCard } from './MessageCard'
 import { Footer } from './footer'
 import { Header } from './header'
 import { UserList } from './leftPanel'
@@ -62,6 +63,8 @@ export class MainPage {
   footer: Footer = new Footer()
   loader: any
   divider: HTMLDivElement | undefined
+  messageCard: MessageCard
+  editModeId: string = ''
 
   constructor() {
     this.header = new Header()
@@ -80,6 +83,8 @@ export class MainPage {
         }
       })
     }
+    this.activeChat.bindHandleMessage(this.handleSenderMessage.bind(this))
+    this.activeChat.bindCancelButton(this.cancelEditing.bind(this))
     if (!this.webSocketClient.isOpen()) {
       this.webSocketClient.connect()
     }
@@ -88,6 +93,7 @@ export class MainPage {
     this.inactiveUsers = []
     this.setupEventListeners()
     this.isOnline = false
+    this.messageCard = new MessageCard()
   }
 
   init() {
@@ -150,6 +156,7 @@ export class MainPage {
       'click',
       this.removeDivider.bind(this),
     )
+
     this.activeChat.activeChat.addEventListener(
       'wheel',
       this.removeDivider.bind(this),
@@ -171,6 +178,11 @@ export class MainPage {
   logout = () => {
     if (this.user && this.password) {
       this.webSocketClient.logoutUser(this.id, this.user, this.password)
+    }
+    this.activeChatLogin = ''
+    if (this.activeChat.startChatPanel) {
+      this.activeChat.startChatPanel.textContent =
+        'Choose a friend to chat with'
     }
   }
 
@@ -213,6 +225,9 @@ export class MainPage {
     this.webSocketClient.on('MSG_SEND', this.receiveMessage.bind(this))
     this.webSocketClient.on('MSG_FROM_USER', this.getHistory.bind(this)) // событие отправки массива сообщений с конкретным пользователем
     this.webSocketClient.on('MSG_READ', this.updateUnreadMessages.bind(this))
+    this.webSocketClient.on('MSG_DELIVER', this.changeDeliveryStatus.bind(this))
+    this.webSocketClient.on('MSG_DELETE', this.handleMessageDelete.bind(this))
+    this.webSocketClient.on('MSG_EDIT', this.handleMessageEdit.bind(this))
 
     if (this.user && this.password && !this.isOnline) {
       this.id = this.generateUniqueTimestampID()
@@ -289,6 +304,13 @@ export class MainPage {
     this.toast.showNotification(`${newLoggedInUser} has just logged in`)
     this.webSocketClient.getAllAuthUsers()
     this.webSocketClient.getAllUnauthUsers()
+    if (event.payload.user.login === this.activeChatLogin) {
+      if (!this.activeChat.startChatPanel) return
+      this.activeChat.startChatPanel.textContent = `${this.activeChatLogin}, online`
+      if (this.id && this.activeChatLogin) {
+        this.webSocketClient.getHistory(this.id, this.activeChatLogin)
+      }
+    }
   }
 
   externalUserLogout(event: ThirdPartyUserLogout) {
@@ -296,30 +318,38 @@ export class MainPage {
     this.toast.showNotification(`${newLoggedInUser} has just logged out`)
     this.webSocketClient.getAllAuthUsers()
     this.webSocketClient.getAllUnauthUsers()
+    if (event.payload.user.login === this.activeChatLogin) {
+      if (!this.activeChat.startChatPanel) return
+      this.activeChat.startChatPanel.textContent = `${this.activeChatLogin}, offline`
+    }
   }
   sendMessage() {
     if (
       this.activeChat.activeChat &&
       this.activeChat.mainInput &&
       this.activeChat.sendButton &&
+      this.activeChat.startChatPanel &&
       this.activeChat.mainInput.value.trim()
     ) {
-      const messageElement = createElement('div', 'message-tosend')
-      const text = this.activeChat.mainInput.value
-      messageElement.textContent = text
-      if (
-        this.activeChat.activeChat.textContent ===
-        'Start to chat with your friend'
-      ) {
-        this.activeChat.activeChat.textContent = ''
-      }
-      this.activeChat.activeChat.append(messageElement)
-      messageElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      })
-      if (this.id && this.activeChatLogin) {
-        this.webSocketClient.sendMessage(this.id, this.activeChatLogin, text)
+      if (!this.editModeId) {
+        const text = this.activeChat.mainInput.value
+        if (this.id && this.activeChatLogin) {
+          this.webSocketClient.sendMessage(this.id, this.activeChatLogin, text)
+        }
+      } else {
+        if (
+          this.id &&
+          this.editModeId &&
+          this.activeChat.cancelButton &&
+          this.activeChat.rightInputContainer
+        ) {
+          const text = this.activeChat.mainInput.value
+          this.webSocketClient.editMessage(this.id, this.editModeId, text)
+          this.editModeId = ''
+          this.activeChat.rightInputContainer.removeChild(
+            this.activeChat.cancelButton,
+          )
+        }
       }
       this.activeChat.mainInput.value = ''
       this.activeChat.sendButton.classList.remove('submit')
@@ -328,25 +358,32 @@ export class MainPage {
   }
   receiveMessage(event: MessageSentFromUser | MessageSent) {
     const message = event.payload.message
-    if (message.to !== this.user) return
+    if (!this.user) return
     if (
+      message.to === this.activeChatLogin && // получатель === активный чат
+      this.activeChat.activeChat &&
+      this.activeChat.activeChat.style.display !== 'none'
+    ) {
+      const messageElement = this.messageCard.createMessageElement(
+        message,
+        this.user,
+        this.activeChatLogin,
+      )
+      this.activeChat.activeChat.append(messageElement)
+      messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    } else if (
       message.from === this.activeChatLogin && // отправитель === активный чат
       this.activeChat.activeChat &&
       this.activeChat.activeChat.style.display !== 'none'
     ) {
-      const messageElement = createElement('div', 'message-toreceive')
-      const timeOfSending = createElement('div', 'time-of-sending')
-      timeOfSending.textContent = new Date(message.datetime).toLocaleString()
+      const messageElement = this.messageCard.createMessageElement(
+        message,
+        this.user,
+        this.activeChatLogin,
+      )
+      this.activeChat.activeChat.append(messageElement)
+      messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' })
 
-      const text = createElement('div', 'message-toreceive')
-      const sender = createElement('div', 'sender')
-      sender.textContent = this.activeChatLogin
-      text.textContent = message.text
-      messageElement.append(sender, timeOfSending, text)
-      if (this.activeChat.activeChat) {
-        this.activeChat.activeChat.append(messageElement)
-        messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }
       if (this.id) this.webSocketClient.markMessageAsRead(this.id, message.id)
     } else if (message.from !== this.activeChatLogin && this.userList) {
       const existingUser = this.userList.userMessages.find(
@@ -372,100 +409,31 @@ export class MainPage {
 
   getHistory(event: HistoryOfMessages) {
     const messages = event.payload.messages
-
     if (messages.length > 0) {
       const activeUser =
         messages[0].from === this.user ? messages[0].to : messages[0].from
       console.log('Есть история переписки, пользователь:', activeUser)
+
       if (activeUser === this.activeChatLogin) {
-        //пользователь из открытого чата
-        if (!this.activeChat.activeChat) return
-        if (this.activeChat.activeChat?.style.display !== 'none') {
-          this.activeChat.activeChat.textContent = ''
-          if (messages.some((message) => !message.status.isReaded)) {
-            messages.forEach((message) => {
-              const messageElement = createElement('div')
-              messageElement.textContent = message.text
-              if (message.to === this.user) {
-                messageElement.className = 'message-toreceive'
-              } else if (message.to === this.activeChatLogin) {
-                messageElement.className = 'message-tosend'
-              }
-              if (!this.activeChat.activeChat) return
-              this.activeChat.activeChat.append(messageElement)
-              if (this.isFirstNewMessage(message, messages) && this.divider) {
-                this.activeChat.activeChat.insertBefore(
-                  this.divider,
-                  messageElement,
-                )
-
-                messageElement.scrollIntoView({
-                  behavior: 'instant',
-                  block: 'start',
-                })
-                this.divider.style.display = 'flex'
-                console.log('УСТАНОВИЛ КРАСНУЮ ЧЕРТУ')
-              }
-              if (activeUser === message.from && !message.status.isReaded) {
-                if (!this.userList) return
-                const existingUser = this.userList.userMessages.find(
-                  (u) => u.login === activeUser,
-                )
-                if (
-                  existingUser &&
-                  !existingUser.newMessages.includes(message.id)
-                ) {
-                  existingUser.newMessages.push(message.id)
-                }
-
-                this.userList.updateUnreadMessagesNumber()
-                //   this.webSocketClient.markMessageAsRead(this.id, message.id)
-              }
-            })
-          } else if (!messages.some((message) => !message.status.isReaded)) {
-            console.log('непрочитанных нет')
-            if (this.activeChat.activeChat?.style.display !== 'none') {
-              this.activeChat.activeChat.textContent = ''
-              messages.forEach((message) => {
-                const messageElement = createElement('div')
-                messageElement.textContent = message.text
-                if (message.to === this.user) {
-                  messageElement.className = 'message-toreceive'
-                } else if (message.to === this.activeChatLogin) {
-                  messageElement.className = 'message-tosend'
-                }
-                if (!this.activeChat.activeChat) return
-                this.activeChat.activeChat.append(messageElement)
-
-                messageElement.scrollIntoView({
-                  behavior: 'instant',
-                  block: 'start',
-                })
-              })
-            }
-          }
-        }
-      } else if (activeUser !== this.activeChatLogin) {
-        if (!this.userList) return
-        const existingUser = this.userList.userMessages.find(
-          (u) => u.login === activeUser,
+        //переписка открыта
+        if (
+          !this.activeChat.activeChat ||
+          this.activeChat.activeChat.style.display === 'none'
         )
-        console.log(existingUser, 'existing user')
-        if (existingUser) {
-          console.log('ФИЛЬТРАЦИЯ НЕПРОЧИТАННЫХ ВХОДЯЩИХ, переписка закрыта')
-          const filteredArr = messages.filter(
-            (message) => !message.status.isReaded && message.to === this.user,
-          )
+          return
+        this.activeChat.activeChat.textContent = '' //сносим все сообщения
 
-          filteredArr.forEach((el) => {
-            if (!existingUser.newMessages.includes(el.id))
-              existingUser.newMessages.push(el.id)
-          })
-
-          this.userList.updateUnreadMessagesNumber()
-        }
+        messages.forEach((message) => {
+          this.handleMessage(message, messages) // обрабатываем массив
+        })
+      } else {
+        // переписка закрыта - надо навесить кружочек
+        console.log('переписка закрыта')
+        messages.forEach((message) => {
+          this.handleUnreadMessages(message, activeUser)
+        })
       }
-    } else if (messages.length === 0) {
+    } else {
       if (
         this.activeChat.activeChat?.style.display === 'none' ||
         !this.activeChat.activeChat
@@ -480,7 +448,7 @@ export class MainPage {
 
   reconnect() {
     this.loader.init()
-    this.loader.showLoader(10000, 'Loading...')
+    this.loader.showLoader(5000, 'Loading...')
   }
 
   isFirstNewMessage(message: Message, messages: Message[]) {
@@ -512,9 +480,10 @@ export class MainPage {
     }
   }
 
-  updateUnreadMessages(event: ReadStatusChange | ReadStatusNotification) {
+  updateUnreadMessages(
+    event: ReadStatusChange | ReadStatusNotification | MessageDeleted,
+  ) {
     const messageId = event.payload.message.id
-    console.log(messageId, this.userList?.userMessages)
     if (this.userList) {
       const activeUser: UnreadUserMessages | undefined =
         this.userList.userMessages.find((u) =>
@@ -528,24 +497,139 @@ export class MainPage {
         )
         activeUser.newMessages = updatedUser
         this.userList.updateUnreadMessagesNumber() // Update the UI
+      } else {
+        console.log('ОТКРЫТ ДИАЛОГ')
+        if (this.id && this.activeChatLogin) {
+          this.webSocketClient.getHistory(this.id, this.activeChatLogin)
+        }
       }
     }
   }
   hideActiveChat(event: { target: any }) {
-    if (
-      this.activeChat &&
-      this.activeChat.activeChat &&
-      this.activeChat.rightInputContainer &&
-      this.activeChat.startChatPanel &&
-      event.target &&
-      event.target instanceof HTMLElement
-    ) {
+    if (this.activeChat) {
       this.activeChatLogin = ''
-      this.activeChat.activeChat.style.display = 'none'
-      this.activeChat.rightInputContainer.style.display = 'none'
-      this.activeChat.startChatPanel.style.height = '95%'
-      this.activeChat.startChatPanel.textContent =
-        'Choose a friend to chat with'
+      this.activeChat.hideActiveChat(event)
+    }
+  }
+
+  changeDeliveryStatus(event: MessageDelivered) {
+    if (this.id && this.activeChatLogin) {
+      this.webSocketClient.getHistory(this.id, this.activeChatLogin)
+    }
+  }
+
+  handleMessage(message: Message, messages: Message[]) {
+    const activeUser =
+      messages[0].from === this.user ? messages[0].to : messages[0].from
+    if (!(this.user && this.activeChatLogin)) return
+    const messageElement = this.messageCard.createMessageElement(
+      message,
+      this.user,
+      this.activeChatLogin,
+    )
+
+    if (!this.activeChat.activeChat) return
+    this.activeChat.activeChat.append(messageElement)
+    // обрабатываем первое непрочитанное
+    if (this.isFirstNewMessage(message, messages) && this.divider) {
+      this.activeChat.activeChat.insertBefore(this.divider, messageElement)
+      this.divider.style.display = 'flex'
+      this.divider.scrollIntoView({ behavior: 'instant', block: 'start' })
+    }
+
+    this.handleUnreadMessages(message, activeUser)
+    console.log(
+      66666,
+      messages[messages.length - 1].id,
+      message.id,
+      messages[messages.length - 1].id === message.id,
+    )
+    if (
+      (messages[messages.length - 1].id === message.id &&
+        message.status.isReaded) || //последнее прочитанное
+      (messages[messages.length - 1].id === message.id &&
+        message.from === this.user)
+    ) {
+      console.log(message.text, 5555555)
+      messageElement.scrollIntoView({ behavior: 'instant', block: 'start' })
+    }
+  }
+
+  handleUnreadMessages(message: Message, activeUser: string) {
+    if (message.from === activeUser && !message.status.isReaded) {
+      if (!this.userList) return
+      const existingUser = this.userList.userMessages.find(
+        (u) => u.login === activeUser,
+      )
+      if (existingUser && !existingUser.newMessages.includes(message.id)) {
+        existingUser.newMessages.push(message.id)
+      }
+      this.userList.updateUnreadMessagesNumber()
+    }
+  }
+  handleSenderMessage(process: string, id: string) {
+    if (process === 'delete') {
+      console.log(id, process)
+      this.deleteMessage(id)
+    }
+    if (process === 'edit') {
+      console.log(id, process)
+      this.editMessage(id)
+    }
+  }
+
+  handleMessageDelete(event: MessageDeleted) {
+    this.updateUnreadMessages(event)
+    if (this.id && this.activeChatLogin) {
+      this.webSocketClient.getHistory(this.id, this.activeChatLogin)
+    }
+  }
+
+  handleMessageEdit(event: MessageEdited) {
+    if (this.id && this.activeChatLogin) {
+      this.webSocketClient.getHistory(this.id, this.activeChatLogin)
+    }
+  }
+
+  deleteMessage(id: string) {
+    if (this.id) {
+      this.webSocketClient.deleteMessage(this.id, id)
+    }
+  }
+
+  editMessage(id: string) {
+    if (!this.id) return
+    const textContainer = document.getElementById(id)
+    if (textContainer) {
+      const thirdChildElement = textContainer.children[2]
+      if (!thirdChildElement.firstChild) return
+      const text = thirdChildElement.firstChild.textContent
+      console.log(44444, textContainer, text)
+      if (
+        this.activeChat.mainInput &&
+        text &&
+        this.activeChat.cancelButton &&
+        this.activeChat.rightInputContainer
+      ) {
+        this.activeChat.mainInput.value = text
+        this.editModeId = id
+        this.activeChat.rightInputContainer.append(this.activeChat.cancelButton)
+        this.activeChat.unableSendButton()
+      }
+    }
+  }
+  cancelEditing() {
+    if (
+      this.activeChat.mainInput &&
+      this.activeChat.cancelButton &&
+      this.activeChat.rightInputContainer
+    ) {
+      this.activeChat.mainInput.value = ''
+      this.editModeId = ''
+      this.activeChat.rightInputContainer.removeChild(
+        this.activeChat.cancelButton,
+      )
+      this.activeChat.disableSendButton()
     }
   }
 }

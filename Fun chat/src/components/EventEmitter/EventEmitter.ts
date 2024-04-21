@@ -57,7 +57,6 @@ export class CustomEventEmitter<T extends EventMap>
       }
     }
   }
-
 }
 
 export interface EventMap {
@@ -77,6 +76,8 @@ export interface EventMap {
   userClicked: User
   WEBSOCKET_OPEN: undefined
   WEBSOCKET_CLOSED: void
+  deleteClicked: string 
+  editClicked: string 
 }
 
 export type EventKey<T> = keyof T

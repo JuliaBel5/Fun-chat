@@ -47,7 +47,7 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
     } else if (
       message.type === 'USER_ACTIVE' ||
       message.type === 'USER_INACTIVE' ||
-      message.type === 'MSG_READ' ||
+      // message.type === 'MSG_READ' ||
       message.type === 'MSG_SEND'
     ) {
       this.emit(message.type, message)
@@ -168,6 +168,33 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
       },
     }
 
+    this.socket.send(JSON.stringify(request))
+  }
+
+  public deleteMessage(id: string, messageId: string): void {
+    const request = {
+      id: id,
+      type: 'MSG_DELETE',
+      payload: {
+        message: {
+          id: messageId,
+        },
+      },
+    }
+    this.socket.send(JSON.stringify(request))
+  }
+
+  public editMessage(id: string, messageId: string, text: string): void {
+    const request = {
+      id: id,
+      type: 'MSG_EDIT',
+      payload: {
+        message: {
+          id: messageId,
+          text: text,
+        },
+      },
+    }
     this.socket.send(JSON.stringify(request))
   }
   public removeListener(

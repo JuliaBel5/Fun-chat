@@ -7,6 +7,14 @@
   border-radius: 10px;
 }
 
+@media screen and (max-width: 1020px) {
+  .game-container {
+    max-width: 98%;
+    min-width: 98%;
+  }
+}
+
+
 .left-panel {
   width: 40%;
   border: 3px solid $redBook;
@@ -75,6 +83,7 @@
 }
 
 .input-container {
+  position: relative;
   width: 95%;
   display: flex;
   justify-content: space-between;
@@ -117,6 +126,7 @@
 .time-of-sending {
   width: 45%;
   font-size: 12px;
+  text-align: end;
 }
 
 .sender {
@@ -131,6 +141,39 @@
   border-radius: 7px;
 }
 
+.delivered {
+  width: 45%;
+  font-size: 12px;
+  text-align: end;
+
+}
+
+.edited {
+  width: 45%;
+  font-size: 12px;
+  text-align: start;
+}
+
+.cancel-button {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  left: 75%;
+  top: 35%;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background-color: rgba(114, 54, 64, 0.8);
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  border: 1px solid $redBook;
+  color: rgb(29, 28, 28);
+  z-index: 25;
+
+}
+
 .submit {
   @include SubmitButton
 }
@@ -142,20 +185,47 @@
 .message-tosend {
   margin: 5px;
   padding: 5px;
+  width: 99%;
+  align-self: flex-end;
+  border-radius: 7px;
+  border: 0.5px solid rgb(174, 236, 190);
+  background: rgba(176, 236, 197, 0.5);
+}
+
+.message-tosend-wrapper {
+  position: relative;
+  margin: 5px;
+  padding: 5px;
   width: 60%;
   align-self: flex-end;
   border-radius: 7px;
-  border: 0.5px solid rgb(94, 240, 240);
-  background: rgba(155, 238, 238, 0.5);
+  border: 0.5px solid rgb(174, 236, 190);
+  background: rgba(176, 236, 197, 0.5);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
-.message-toreceive {
+.message-toreceive-wrapper {
+  position: relative;
   margin: 5px;
   padding: 5px;
   width: 60%;
   align-self: flex-start;
   border-radius: 7px;
   border: 0.5px solid rgb(17, 90, 154);
+  background: rgba(126, 167, 218, 0.5);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.message-toreceive {
+  margin: 5px;
+  padding: 5px;
+  width: 99%;
+  align-self: flex-start;
+  border-radius: 7px;
   background: rgba(126, 167, 218, 0.5);
   display: flex;
   flex-wrap: wrap;
@@ -166,7 +236,7 @@
   width: 20px;
   height: 20px;
   background-color: rgba(44, 90, 67, 0.5);
-  color: rgb(245, 242, 54);
+  color: rgb(240, 239, 165);
   border-radius: 50%;
   text-align: center;
   line-height: 20px;
@@ -223,5 +293,22 @@
 
 .divider {
   width: 99%;
-  border-bottom: 2px solid $redBook;
+  height: 5px;
+  background-color: rgb(193, 40, 40);
+  border: 2px solid rgb(193, 40, 40);
+  position: relative;
+  margin: 7px 0;
+}
+
+.divider::after {
+  content: 'New messages';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgb(246, 224, 200);
+  font-size: 12px;
+  text-align: center;
+  border-radius: 7px;
+  padding: 3px;
 }
