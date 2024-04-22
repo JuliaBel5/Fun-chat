@@ -50,7 +50,9 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
       message.type === 'MSG_READ' ||
       message.type === 'MSG_SEND' ||
       message.type === 'MSG_FROM_USER' ||
-      message.type === 'USER_EXTERNAL_LOGIN'
+      message.type === 'USER_EXTERNAL_LOGIN' ||
+      message.type === 'MSG_EDIT' ||
+      message.type === 'USER_LOGIN'
     ) {
       this.emit(message.type, message)
     } else {

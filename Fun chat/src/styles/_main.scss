@@ -184,7 +184,15 @@
 
 @media screen and (max-width: 500px) {
   .time-of-sending {
+    width: 53%;
     font-size: 8px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .delivered {
+    width: 53%;
+
   }
 }
 
