@@ -44,7 +44,11 @@ export class Footer {
       this.audio.volume = 0.3
       this.audio.play()
     })
-    this.titleContainer = createElement('div', 'school-container', '2024')
+    this.titleContainer = createElement(
+      'div',
+      'school-container',
+      '2024, April',
+    )
     this.schoolContainer.append(this.schoolLogo, this.nameContainer)
     this.footer.append(
       this.schoolContainer,

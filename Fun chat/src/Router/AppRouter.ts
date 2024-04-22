@@ -70,7 +70,6 @@ export class AppRouter {
     this.isAuth = this.isUserAuth()
 
     if ((path === '/login' && this.isAuth) || (path === '/' && this.isAuth)) {
-      console.log('this case', path)
       this.navigate('/main')
       return
     }

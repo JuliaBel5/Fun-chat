@@ -1,4 +1,4 @@
 import './styles.scss'
 import { router } from './Router/AppRouter'
 
-const appRouter = router
+export const appRouter = router

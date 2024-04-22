@@ -33,7 +33,7 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
     this.socket.addEventListener('close', this.handleClose)
   }
 
-  handleOpen = (event: Event) => {
+  handleOpen = () => {
     console.log('Connected to WebSocket server')
     this.emit('WEBSOCKET_OPEN', undefined)
     this.reconnectAttempts = 0
@@ -47,8 +47,10 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
     } else if (
       message.type === 'USER_ACTIVE' ||
       message.type === 'USER_INACTIVE' ||
-      // message.type === 'MSG_READ' ||
-      message.type === 'MSG_SEND'
+      message.type === 'MSG_READ' ||
+      message.type === 'MSG_SEND' ||
+      message.type === 'MSG_FROM_USER' ||
+      message.type === 'USER_EXTERNAL_LOGIN'
     ) {
       this.emit(message.type, message)
     } else {
@@ -82,7 +84,6 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
   }
 
   public loginUser(id = '', login: string, password: string): void {
-    console.log('Выслал запрос на логин', login)
     const loginRequest = {
       id,
       type: 'USER_LOGIN',
@@ -210,13 +211,5 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
     }
   }
 }
-const ws = new WebSocketClient('ws://localhost:4000')
+const ws = new WebSocketClient('ws://127.0.0.1:4000')
 export default ws
-
-interface ActiveUsersList {
-  id: string
-  type: 'USER_ACTIVE'
-  payload: {
-    users: []
-  }
-}

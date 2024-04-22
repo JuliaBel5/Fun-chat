@@ -11,6 +11,7 @@ export class ActiveChat {
   sendButton: HTMLButtonElement | undefined
   modal: ModalWindow = new ModalWindow()
   cancelButton: HTMLButtonElement | undefined
+  inputWrapper: HTMLDivElement | undefined
 
   constructor() {
     this.init()
@@ -31,13 +32,15 @@ export class ActiveChat {
     )
     this.mainInput = createElement('input', 'main-input', '')
 
+    this.inputWrapper = createElement('div', 'input-wrapper')
+
     this.cancelButton = createElement(
       'button',
       'cancel-button',
       'x',
       'cancelButton',
     )
-
+    this.inputWrapper.append(this.mainInput)
     this.sendButton = createElement(
       'button',
       'disabled-submit',
@@ -57,7 +60,7 @@ export class ActiveChat {
       }
     })
 
-    this.rightInputContainer.append(this.mainInput, this.sendButton)
+    this.rightInputContainer.append(this.inputWrapper, this.sendButton)
   }
   bindSendMessage = (handler: HandlerFunction) => {
     if (this.sendButton) {
@@ -74,7 +77,6 @@ export class ActiveChat {
   bindHandleMessage = (handler: HandlerFunction1) => {
     if (!this.activeChat) return
     this.activeChat.addEventListener('contextmenu', (event): void => {
-      console.log(event.target)
       event.preventDefault()
       if (
         (event.target instanceof HTMLElement &&
@@ -88,16 +90,15 @@ export class ActiveChat {
         (event.target instanceof HTMLElement &&
           event.target.classList.contains('time-of-sending'))
       ) {
+        this.modal = new ModalWindow()
         this.modal.show(event.target)
         const closestElementWithId = event.target.closest('[id]')
         const id = closestElementWithId ? closestElementWithId.id : null
         if (!id) return
         this.modal.on('deleteClicked', (eventData): void => {
-          console.log(eventData)
           handler(eventData, id)
         })
         this.modal.on('editClicked', (eventData): void => {
-          console.log(eventData)
           handler(eventData, id)
         })
       }

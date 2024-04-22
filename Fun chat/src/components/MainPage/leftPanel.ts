@@ -73,7 +73,6 @@ export class UserList extends CustomEventEmitter<EventMap> {
         this.usersList.push(wrappedUser)
       }
     })
-    console.log(this.userMessages)
   }
 
   addUser(user: User) {
@@ -81,7 +80,7 @@ export class UserList extends CustomEventEmitter<EventMap> {
     const userDiv = createElement('div', 'user-status', user.login, user.login)
     const statusCircle = createElement('span', 'status')
     statusCircle.style.backgroundColor = user.isLogined ? 'green' : 'red'
-    console.log('НАВЕШЕН СЛУШАТЕЛЬ НА ВРАППЕР')
+
     userWrapper.addEventListener('click', (event) => {
       event.stopPropagation()
       this.emit('userClicked', user)

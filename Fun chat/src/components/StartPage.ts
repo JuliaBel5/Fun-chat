@@ -53,13 +53,11 @@ export class Start {
 
       if (this.main.userList) {
         this.main.userList.user = firstNameValue
-        console.log('this.main.userList.user', this.main.userList.user)
         this.password = passwordValue
         sessionStorage.setItem(
           'MrrrChatTempUser',
           JSON.stringify(this.userAuthData),
         )
-        console.log('start', this.user, this.password)
         this.main.id = this.main.generateUniqueTimestampID()
         if (this.user && this.password) {
           this.main.webSocketClient.loginUser(

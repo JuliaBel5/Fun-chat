@@ -2,7 +2,7 @@ import { createElement } from '../Utils/createElement'
 import { CustomEventEmitter, EventMap } from './EventEmitter/EventEmitter'
 type HandlerFunction = () => void
 
-export class ModalWindow extends CustomEventEmitter<EventMap>  {
+export class ModalWindow extends CustomEventEmitter<EventMap> {
   modal: HTMLDivElement
   modalContent: HTMLDivElement
   deleteButton: HTMLButtonElement
@@ -39,21 +39,26 @@ export class ModalWindow extends CustomEventEmitter<EventMap>  {
   }
 
   hide() {
-    this.modal.style.display = 'none'
+    //   this.modal.style.display = 'none'
+    this.remove()
     this.isActive = false
   }
 
   handleDelete() {
-     this.emit('deleteClicked', 'delete');
+    this.emit('deleteClicked', 'delete')
     this.hide()
   }
 
   handleEdit() {
-    this.emit('editClicked', 'edit');
+    this.emit('editClicked', 'edit')
     this.hide()
   }
 
   bindEditButton = (handler: HandlerFunction) => {
     this.editButton.addEventListener('click', () => handler())
+  }
+
+  remove() {
+    return this.modal.remove()
   }
 }

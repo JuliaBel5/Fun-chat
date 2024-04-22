@@ -14,6 +14,12 @@
   margin-top: 10px;
 }
 
+@media screen and (max-width: 1020px) {
+  .footer {
+    width: 98%;
+  }
+}
+
 .schoolname-container {
   display: flex;
   justify-content: flex-start;

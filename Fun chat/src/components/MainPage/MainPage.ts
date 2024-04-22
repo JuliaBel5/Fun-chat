@@ -3,13 +3,10 @@ import ws, { WebSocketClient } from '../../Service/WebSocketClient'
 import { createElement } from '../../Utils/createElement'
 import {
   ActiveUsersList,
-  ErrorMessage,
   HistoryOfMessages,
   InactiveUsersList,
   Message,
   MessageDeleted,
-  MessageDelivered,
-  MessageEdited,
   MessageSent,
   MessageSentFromUser,
   ReadStatusChange,
@@ -18,8 +15,6 @@ import {
   ThirdPartyUserLogout,
   UnreadUserMessages,
   User,
-  UserLogin,
-  UserLogout,
 } from '../EventEmitter/types'
 import { Loader } from '../Loader'
 import { userData } from '../StartPage'
@@ -110,15 +105,12 @@ export class MainPage {
       if (this.webSocketClient.isOpen()) {
         this.isOnline = false
         this.loader.hideLoader()
-        //  this.webSocketClient.getAllAuthUsers()
-        //  this.webSocketClient.getAllUnauthUsers()
       }
       this.startChat()
     }
   }
 
   startChat() {
-    console.log('Навешен слушательно клик по пользователю')
     if (!this.userList) return
     this.gameArea = createElement('div', 'gamearea')
     document.body.append(this.gameArea)
@@ -197,7 +189,6 @@ export class MainPage {
       'WEBSOCKET_OPEN',
       this.sendInitialRequests.bind(this),
     )
-    console.log('навесили')
   }
 
   sendInitialRequests() {
@@ -249,7 +240,6 @@ export class MainPage {
           this.activeChat.rightInputContainer.style.display = 'flex'
         }
         if (this.id && this.activeChatLogin) {
-          console.log('вызвана история по клику')
           this.webSocketClient.getHistory(this.id, this.activeChatLogin)
         }
       })
@@ -260,7 +250,7 @@ export class MainPage {
     return Date.now() + Math.random().toString(36).slice(2, 11)
   }
 
-  loginSucces(event: UserLogin) {
+  loginSucces() {
     this.isOnline = true
     const MrrrChatTempUserData = sessionStorage.getItem('MrrrChatTempUser')
     if (MrrrChatTempUserData) {
@@ -276,7 +266,7 @@ export class MainPage {
     console.log('логин прошел успешно')
   }
 
-  logoutSucces(event: UserLogout) {
+  logoutSucces() {
     this.isOnline = false
     this.user = ''
     this.password = ''
@@ -341,14 +331,12 @@ export class MainPage {
           this.id &&
           this.editModeId &&
           this.activeChat.cancelButton &&
-          this.activeChat.rightInputContainer
+          this.activeChat.inputWrapper
         ) {
           const text = this.activeChat.mainInput.value
           this.webSocketClient.editMessage(this.id, this.editModeId, text)
           this.editModeId = ''
-          this.activeChat.rightInputContainer.removeChild(
-            this.activeChat.cancelButton,
-          )
+          this.activeChat.inputWrapper.removeChild(this.activeChat.cancelButton)
         }
       }
       this.activeChat.mainInput.value = ''
@@ -396,7 +384,6 @@ export class MainPage {
   fetchMessageHistory() {
     if (this.activeUsers && this.inactiveUsers) {
       const arr = this.activeUsers.concat(this.inactiveUsers)
-      console.log(arr, 'запрос на фетч')
       arr.forEach((user) => {
         if (user.login !== this.user) {
           if (this.id) {
@@ -412,7 +399,7 @@ export class MainPage {
     if (messages.length > 0) {
       const activeUser =
         messages[0].from === this.user ? messages[0].to : messages[0].from
-      console.log('Есть история переписки, пользователь:', activeUser)
+      //Есть история переписки, пользователь:', activeUser
 
       if (activeUser === this.activeChatLogin) {
         //переписка открыта
@@ -428,7 +415,6 @@ export class MainPage {
         })
       } else {
         // переписка закрыта - надо навесить кружочек
-        console.log('переписка закрыта')
         messages.forEach((message) => {
           this.handleUnreadMessages(message, activeUser)
         })
@@ -447,6 +433,9 @@ export class MainPage {
   }
 
   reconnect() {
+    this.toast.showNotification(
+      'Connection with server lost, trying to reconnect...',
+    )
     this.loader.init()
     this.loader.showLoader(5000, 'Loading...')
   }
@@ -465,7 +454,6 @@ export class MainPage {
 
   removeDivider() {
     if (this.divider && this.divider.style.display !== 'none') {
-      console.log('УДАЛИЛ КРАСНУЮ ЧЕРТУ')
       this.divider.style.display = 'none'
       if (!this.userList) return
       const existingUser = this.userList.userMessages.find(
@@ -489,16 +477,14 @@ export class MainPage {
         this.userList.userMessages.find((u) =>
           u.newMessages.includes(messageId),
         )
-      console.log('activeUser', activeUser)
       if (activeUser) {
-        // Remove the id of the read message from the id array
         const updatedUser: string[] = activeUser.newMessages.filter(
           (id) => id !== messageId,
         )
         activeUser.newMessages = updatedUser
-        this.userList.updateUnreadMessagesNumber() // Update the UI
+        this.userList.updateUnreadMessagesNumber()
       } else {
-        console.log('ОТКРЫТ ДИАЛОГ')
+        //'ОТКРЫТ ДИАЛОГ'
         if (this.id && this.activeChatLogin) {
           this.webSocketClient.getHistory(this.id, this.activeChatLogin)
         }
@@ -512,7 +498,7 @@ export class MainPage {
     }
   }
 
-  changeDeliveryStatus(event: MessageDelivered) {
+  changeDeliveryStatus() {
     if (this.id && this.activeChatLogin) {
       this.webSocketClient.getHistory(this.id, this.activeChatLogin)
     }
@@ -538,19 +524,13 @@ export class MainPage {
     }
 
     this.handleUnreadMessages(message, activeUser)
-    console.log(
-      66666,
-      messages[messages.length - 1].id,
-      message.id,
-      messages[messages.length - 1].id === message.id,
-    )
+
     if (
       (messages[messages.length - 1].id === message.id &&
         message.status.isReaded) || //последнее прочитанное
       (messages[messages.length - 1].id === message.id &&
         message.from === this.user)
     ) {
-      console.log(message.text, 5555555)
       messageElement.scrollIntoView({ behavior: 'instant', block: 'start' })
     }
   }
@@ -569,11 +549,9 @@ export class MainPage {
   }
   handleSenderMessage(process: string, id: string) {
     if (process === 'delete') {
-      console.log(id, process)
       this.deleteMessage(id)
     }
     if (process === 'edit') {
-      console.log(id, process)
       this.editMessage(id)
     }
   }
@@ -585,7 +563,7 @@ export class MainPage {
     }
   }
 
-  handleMessageEdit(event: MessageEdited) {
+  handleMessageEdit() {
     if (this.id && this.activeChatLogin) {
       this.webSocketClient.getHistory(this.id, this.activeChatLogin)
     }
@@ -593,7 +571,7 @@ export class MainPage {
 
   deleteMessage(id: string) {
     if (this.id) {
-      this.webSocketClient.deleteMessage(this.id, id)
+        this.webSocketClient.deleteMessage(this.id, id)
     }
   }
 
@@ -604,16 +582,15 @@ export class MainPage {
       const thirdChildElement = textContainer.children[2]
       if (!thirdChildElement.firstChild) return
       const text = thirdChildElement.firstChild.textContent
-      console.log(44444, textContainer, text)
       if (
         this.activeChat.mainInput &&
         text &&
         this.activeChat.cancelButton &&
-        this.activeChat.rightInputContainer
+        this.activeChat.inputWrapper
       ) {
         this.activeChat.mainInput.value = text
         this.editModeId = id
-        this.activeChat.rightInputContainer.append(this.activeChat.cancelButton)
+        this.activeChat.inputWrapper.append(this.activeChat.cancelButton)
         this.activeChat.unableSendButton()
       }
     }
@@ -622,13 +599,11 @@ export class MainPage {
     if (
       this.activeChat.mainInput &&
       this.activeChat.cancelButton &&
-      this.activeChat.rightInputContainer
+      this.activeChat.inputWrapper
     ) {
       this.activeChat.mainInput.value = ''
       this.editModeId = ''
-      this.activeChat.rightInputContainer.removeChild(
-        this.activeChat.cancelButton,
-      )
+      this.activeChat.inputWrapper.removeChild(this.activeChat.cancelButton)
       this.activeChat.disableSendButton()
     }
   }

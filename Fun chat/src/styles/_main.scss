@@ -3,8 +3,8 @@
   display: flex;
   min-height: 650px;
   min-width: 1000px;
-  max-width: 1200px;
   border-radius: 10px;
+
 }
 
 @media screen and (max-width: 1020px) {
@@ -83,8 +83,15 @@
 }
 
 .input-container {
-  position: relative;
   width: 95%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -92,7 +99,7 @@
 
 .left-input {
   margin: 10px 0;
-  width: 90%;
+  width: 100%;
   border-radius: 7px;
   height: 35px;
 }
@@ -113,7 +120,8 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: flex-end;
+  align-items: center;
+  font-family: 'Tillana', system-ui;
   width: 95%;
   height: 80%;
   max-height: 500px;
@@ -125,11 +133,13 @@
 
 .time-of-sending {
   width: 45%;
-  font-size: 12px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 10px;
   text-align: end;
 }
 
 .sender {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   width: 45%;
   font-size: 12px;
 }
@@ -139,19 +149,43 @@
   height: 35px;
   width: 85%;
   border-radius: 7px;
+  padding-right: 10px;
 }
 
+
+
 .delivered {
+
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   width: 45%;
   font-size: 12px;
   text-align: end;
-
 }
 
+
+
 .edited {
+  align-self: flex-start;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   width: 45%;
   font-size: 12px;
   text-align: start;
+}
+
+@media screen and (max-width: 500px) {
+
+  .edited,
+  .delivered,
+  .time-of-sending,
+  .sender {
+    font-size: 10px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .time-of-sending {
+    font-size: 8px;
+  }
 }
 
 .cancel-button {
@@ -159,19 +193,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  left: 75%;
-  top: 35%;
+  right: 15%;
+  top: 15%;
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  background-color: rgba(114, 54, 64, 0.8);
+  background-color: rgba(114, 54, 64, 1);
   text-align: center;
   font-size: 18px;
   font-weight: 600;
   border: 1px solid $redBook;
-  color: rgb(29, 28, 28);
+  color: rgb(251, 247, 247);
   z-index: 25;
 
+}
+
+.cancel-button:hover {
+  color: yellow;
+  border: 1px solid rgb(234, 160, 42);
 }
 
 .submit {
@@ -186,10 +225,13 @@
   margin: 5px;
   padding: 5px;
   width: 99%;
+  font-size: 16px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   align-self: flex-end;
   border-radius: 7px;
-  border: 0.5px solid rgb(174, 236, 190);
-  background: rgba(176, 236, 197, 0.5);
+  border: 0.5px solid rgb(198, 239, 201);
+  background: rgba(126, 154, 110, 0.6);
+  word-wrap: break-word;
 }
 
 .message-tosend-wrapper {
@@ -199,10 +241,11 @@
   width: 60%;
   align-self: flex-end;
   border-radius: 7px;
-  border: 0.5px solid rgb(174, 236, 190);
-  background: rgba(176, 236, 197, 0.5);
+  border: 0.5px solid rgb(35, 95, 29);
+  background: rgba(126, 154, 110, 0.4);
   display: flex;
   flex-wrap: wrap;
+  text-align: justify;
   justify-content: space-between;
 }
 
@@ -224,10 +267,15 @@
   margin: 5px;
   padding: 5px;
   width: 99%;
+  font-size: 16px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   align-self: flex-start;
   border-radius: 7px;
+  border: 0.5px solid rgb(199, 234, 247);
   background: rgba(126, 167, 218, 0.5);
   display: flex;
+  text-align: justify;
+  word-wrap: break-word;
   flex-wrap: wrap;
 }
 
@@ -293,7 +341,7 @@
 
 .divider {
   width: 99%;
-  height: 5px;
+  height: 3px;
   background-color: rgb(193, 40, 40);
   border: 2px solid rgb(193, 40, 40);
   position: relative;

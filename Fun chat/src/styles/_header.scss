@@ -11,8 +11,14 @@
   background: rgba(247, 236, 218, 0.6);
   border: 2px solid $redBook;
   border-radius: 7px;
-  padding: 5px 10px;
+  padding: 5px;
   margin-top: 10px;
+}
+
+@media screen and (max-width: 1020px) {
+  .header {
+    width: 98%;
+  }
 }
 
 .name-container {
@@ -20,11 +26,17 @@
   justify-content: flex-start;
   align-items: center;
   height: 50px;
-  width: 250px;
+  width: 200px;
   font-family: 'Tillana', system-ui;
   font-size: 24px;
-  gap: 10px;
 
+}
+
+@media screen and (max-width: 900px) {
+  .name-container {
+    font-size: 20px;
+    width: 150px;
+  }
 }
 
 
@@ -33,12 +45,13 @@
   height: 75px;
   cursor: pointer;
   display: inline-block;
-  margin-right: 20px;
+  margin-right: 10px;
 }
+
 
 .title-container {
   height: 50px;
-  width: 250px;
+  width: 100px;
   font-family: 'Tillana', system-ui;
   font-size: 24px;
   color: rgb(56, 12, 98);
@@ -48,18 +61,40 @@
   text-align: center;
 }
 
+@media screen and (max-width: 900px) {
+  .title-container {
+    font-size: 20px;
+    width: 150px;
+  }
+}
+
 .icon-container {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   height: 70px;
-  gap: 20px;
+  gap: 10px;
+  width: 300px;
+}
+
+@media screen and (max-width: 600px) {
+  .icon-container {
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+  }
 }
 
 .header-button {
   @include startButton;
   margin-top: 5px;
-  width: 200px;
+  max-width: 150px;
+}
+
+@media screen and (max-width: 600px) {
+  .header-button {
+    display: none;
+  }
 }
 
 .logout {

@@ -24,7 +24,13 @@ export class MessageCard {
       'sender',
       isFromUser ? `You say:` : `${activeUser} says:`,
     )
-    messageElement.append(sender, timeOfSending, text)
+    const edited = createElement('div', 'edited')
+    if (!message.status.isEdited) {
+      edited.textContent = ''
+    } else {
+      edited.textContent = 'Edited'
+    }
+    messageElement.append(sender, timeOfSending, text, edited)
     if (isFromUser) {
       //сортирую на полученные, отправленные, прочитанные и непрочитанные
       this.createOutcomingData(message, messageElement)
@@ -35,19 +41,14 @@ export class MessageCard {
   createOutcomingData(message: Message, messageElement: HTMLElement) {
     const delivered = createElement('div', 'delivered')
     if (!message.status.isDelivered) {
-      delivered.textContent = 'Отправлено'
+      delivered.textContent = 'Sent'
     } else if (message.status.isDelivered && !message.status.isReaded) {
-      delivered.textContent = 'Доставлено'
+      delivered.textContent = 'Delivered'
     } else if (message.status.isDelivered && message.status.isReaded) {
-      delivered.textContent = 'Прочитано'
+      delivered.textContent = 'Read'
     }
-    const edited = createElement('div', 'edited')
-    if (!message.status.isEdited) {
-      edited.textContent = ''
-    } else {
-      edited.textContent = 'Edited'
-    }
-    messageElement.append(edited, delivered)
+
+    messageElement.append(delivered)
 
     return messageElement
   }
