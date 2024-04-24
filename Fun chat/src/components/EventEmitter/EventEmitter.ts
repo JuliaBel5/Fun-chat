@@ -57,6 +57,18 @@ export class CustomEventEmitter<T extends EventMap>
       }
     }
   }
+  public removeListener(
+    eventName: keyof EventMap,
+    listener: EventReceiver<EventMap[keyof EventMap]>,
+  ): void {
+    if (this.events[eventName]) {
+      const listeners = this.events[eventName]
+      const index = listeners?.indexOf(listener)
+      if (index && index > -1) {
+        listeners?.splice(index, 1)
+      }
+    }
+  }
 }
 
 export interface EventMap {
@@ -76,8 +88,8 @@ export interface EventMap {
   userClicked: User
   WEBSOCKET_OPEN: undefined
   WEBSOCKET_CLOSED: void
-  deleteClicked: string 
-  editClicked: string 
+  deleteClicked: string
+  editClicked: string
 }
 
 export type EventKey<T> = keyof T

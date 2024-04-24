@@ -28,6 +28,20 @@ export class Start {
       this.login.bindFirstNameInput(this.handleErrors)
       this.login.bindpasswordInput(this.handleErrors)
       this.login.bindSubmit(this.handleSubmit)
+      if (this.login.gameArea)
+        this.login.gameArea.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+            if (this.login.loginButton && !this.login.loginButton.disabled) {
+              event.preventDefault()
+              this.handleSubmit()
+            } else if (
+              this.login.loginButton &&
+              this.login.loginButton.disabled
+            ) {
+              return
+            }
+          }
+        })
     }
   }
 
@@ -75,7 +89,7 @@ export class Start {
   handleErrors = (): void => {
     if (this.login) {
       // eslint-disable-next-line no-useless-escape
-      const alphaHyphenPattern = /^[A-Za-z\-]+$/
+      const alphaHyphenPattern = /^[A-Za-z0-9\-]+$/
       const uppercaseFirstLetterPattern = /^[A-Z]/
 
       if (
@@ -95,7 +109,7 @@ export class Start {
           !alphaHyphenPattern.test(this.login.firstNameInput.value)
         ) {
           this.login.firstNameError.textContent =
-            'Please, use English alphabet letters and hyphen'
+            'Please, use numbers, English alphabet letters and hyphen'
         } else if (
           this.login.firstNameInput.value &&
           !uppercaseFirstLetterPattern.test(
@@ -103,13 +117,13 @@ export class Start {
           )
         ) {
           this.login.firstNameError.textContent =
-            'First name must begin with an uppercase letter'
+            'Your login name must begin with an uppercase letter'
         } else if (
           this.login.firstNameInput.value &&
           this.login.firstNameInput.value.length < 3
         ) {
           this.login.firstNameError.textContent =
-            'First name must be at least 3 characters long'
+            'Your login name must be at least 3 characters long'
         } else if (this.login.firstNameInput.value) {
           this.login.firstNameError.textContent = ''
         }
@@ -119,7 +133,7 @@ export class Start {
           !alphaHyphenPattern.test(this.login.passwordInput.value)
         ) {
           this.login.passwordError.textContent =
-            'Please, use English alphabet letters and hyphen'
+            'Please, use numbers, English alphabet letters and hyphen'
         } else if (
           this.login.passwordInput.value &&
           !uppercaseFirstLetterPattern.test(
@@ -127,13 +141,13 @@ export class Start {
           )
         ) {
           this.login.passwordError.textContent =
-            'Last name must begin with an uppercase letter'
+            'Your password must begin with an uppercase letter'
         } else if (
           this.login.passwordInput.value &&
           this.login.passwordInput.value.length < 4
         ) {
           this.login.passwordError.textContent =
-            'Last name must be at least 4 characters long'
+            'Your password must be at least 4 characters long'
         } else if (this.login.passwordInput.value) {
           this.login.passwordError.textContent = ''
         }

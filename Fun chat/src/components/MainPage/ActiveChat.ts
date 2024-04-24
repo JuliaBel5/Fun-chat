@@ -1,7 +1,7 @@
 import { createElement } from '../../Utils/createElement'
-import { ModalWindow } from '../Modal'
+
+import modal, { ModalWindow } from '../Modal'
 type HandlerFunction = () => void
-type HandlerFunction1 = (id: string, process: string) => void
 
 export class ActiveChat {
   startChatPanel: HTMLDivElement | undefined
@@ -9,7 +9,7 @@ export class ActiveChat {
   activeChat: HTMLDivElement | undefined
   mainInput: HTMLInputElement | undefined
   sendButton: HTMLButtonElement | undefined
-  modal: ModalWindow = new ModalWindow()
+  modal: ModalWindow = modal
   cancelButton: HTMLButtonElement | undefined
   inputWrapper: HTMLDivElement | undefined
 
@@ -74,7 +74,7 @@ export class ActiveChat {
     }
   }
 
-  bindHandleMessage = (handler: HandlerFunction1) => {
+  bindHandleMessage = () => {
     if (!this.activeChat) return
     this.activeChat.addEventListener('contextmenu', (event): void => {
       event.preventDefault()
@@ -90,17 +90,7 @@ export class ActiveChat {
         (event.target instanceof HTMLElement &&
           event.target.classList.contains('time-of-sending'))
       ) {
-        this.modal = new ModalWindow()
-        this.modal.show(event.target)
-        const closestElementWithId = event.target.closest('[id]')
-        const id = closestElementWithId ? closestElementWithId.id : null
-        if (!id) return
-        this.modal.on('deleteClicked', (eventData): void => {
-          handler(eventData, id)
-        })
-        this.modal.on('editClicked', (eventData): void => {
-          handler(eventData, id)
-        })
+        this.modal.show(event, event.target)
       }
     })
   }

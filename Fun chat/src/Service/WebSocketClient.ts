@@ -1,7 +1,6 @@
 import {
   CustomEventEmitter,
   EventMap,
-  EventReceiver,
 } from '../components/EventEmitter/EventEmitter'
 import { Toast } from '../components/toast'
 
@@ -52,7 +51,8 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
       message.type === 'MSG_FROM_USER' ||
       message.type === 'USER_EXTERNAL_LOGIN' ||
       message.type === 'MSG_EDIT' ||
-      message.type === 'USER_LOGIN'
+      message.type === 'USER_LOGIN' ||
+      message.type === 'MSG_DELETE'
     ) {
       this.emit(message.type, message)
     } else {
@@ -199,18 +199,6 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
       },
     }
     this.socket.send(JSON.stringify(request))
-  }
-  public removeListener(
-    eventName: keyof EventMap,
-    listener: EventReceiver<EventMap[keyof EventMap]>,
-  ): void {
-    if (this.events[eventName]) {
-      const listeners = this.events[eventName]
-      const index = listeners?.indexOf(listener)
-      if (index && index > -1) {
-        listeners?.splice(index, 1)
-      }
-    }
   }
 }
 const ws = new WebSocketClient('ws://127.0.0.1:4000')

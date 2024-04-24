@@ -98,7 +98,7 @@ export interface HistoryOfMessages {
   id: string
   type: 'MSG_FROM_USER'
   payload: {
-    messages: Message []
+    messages: Message[]
   }
 }
 
@@ -177,21 +177,21 @@ export interface ErrorMessage {
 }
 
 export type MessageStatus = {
-  isDelivered: boolean;
-  isEdited: boolean;
-  isReaded: boolean;
- };
- 
- export type Message = {
-  datetime: number;
-  from: string;
-  id: string;
-  status: MessageStatus;
-  text: string;
-  to: string;
- };
+  isDelivered: boolean
+  isEdited: boolean
+  isReaded: boolean
+}
 
- export type UnreadUserMessages = {
+export type Message = {
+  datetime: number
+  from: string
+  id: string
+  status: MessageStatus
+  text: string
+  to: string
+}
+
+export type UnreadUserMessages = {
   login: string
   newMessages: string[]
- }
+}

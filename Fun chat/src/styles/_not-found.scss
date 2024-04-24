@@ -1,0 +1,21 @@
+@import './variables';
+@import './mixins';
+@import url('https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Lobster&family=Tillana:wght@400;500;600;700;800&display=swap');
+
+.not-found-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.not-found-image {
+  cursor: pointer;
+  width: 378px;
+}
+
+.not-found-text {
+  font-family: 'Tillana', system-ui;
+  font-size: 24px;
+  color: rgb(56, 12, 98);
+}

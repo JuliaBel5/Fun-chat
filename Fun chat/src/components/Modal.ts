@@ -18,40 +18,61 @@ export class ModalWindow extends CustomEventEmitter<EventMap> {
     this.modalContent = createElement('div', 'modal-content')
 
     this.deleteButton = createElement('button', 'modal-button', 'Delete')
-    this.deleteButton.addEventListener('click', () => this.handleDelete())
+    this.deleteButton.addEventListener('click', (event) =>
+      this.handleDelete(event),
+    )
 
     this.editButton = createElement('button', 'modal-button', 'Edit')
-    this.editButton.addEventListener('click', () => this.handleEdit())
+    this.editButton.addEventListener('click', (event) => this.handleEdit(event))
 
     this.modalContent.append(this.editButton, this.deleteButton)
     this.modal.append(this.modalContent)
-
+    document.addEventListener('click', (event) => {
+      if (event.target !== this.modal) {
+        this.hide()
+      }
+    })
     this.isActive = false
   }
 
-  show(element: HTMLElement) {
+  show(_event: MouseEvent, element: HTMLElement) {
     this.element = element
-    this.element.append(this.modal)
     this.isActive ? (this.isActive = false) : (this.isActive = true)
-    this.isActive
-      ? (this.modal.style.display = 'flex')
-      : (this.modal.style.display = 'none')
+    if (this.isActive) {
+      this.modal.style.display = 'flex'
+      /*    const clientY = event.clientY
+      const rect = element.getBoundingClientRect()
+      const scrollTop =
+        document.documentElement.scrollTop || document.body.scrollTop
+      console.log(scrollTop)
+      const elementTop = rect.top
+      this.modal.style.top = clientY - rect.top + 'px'*/
+      this.element.append(this.modal)
+    }
   }
 
   hide() {
-    //   this.modal.style.display = 'none'
-    this.remove()
+    this.modal.style.display = 'none'
+    //  this.remove()
     this.isActive = false
   }
 
-  handleDelete() {
-    this.emit('deleteClicked', 'delete')
-    this.hide()
+  handleDelete(event: MouseEvent) {
+    const closestElementWithId = (event.target as HTMLElement).closest('[id]')
+    const id = closestElementWithId ? closestElementWithId.id : null
+    if (id) {
+      this.emit('deleteClicked', id)
+      this.hide()
+    }
   }
 
-  handleEdit() {
-    this.emit('editClicked', 'edit')
-    this.hide()
+  handleEdit(event: MouseEvent) {
+    const closestElementWithId = (event.target as HTMLElement).closest('[id]')
+    const id = closestElementWithId ? closestElementWithId.id : null
+    if (id) {
+      this.emit('editClicked', id)
+      this.hide()
+    }
   }
 
   bindEditButton = (handler: HandlerFunction) => {
@@ -62,3 +83,6 @@ export class ModalWindow extends CustomEventEmitter<EventMap> {
     return this.modal.remove()
   }
 }
+
+const modal = new ModalWindow()
+export default modal

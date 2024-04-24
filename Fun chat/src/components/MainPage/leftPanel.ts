@@ -1,4 +1,5 @@
 import { createElement } from '../../Utils/createElement'
+import { truncateWithEllipses } from '../../Utils/truncate'
 import { CustomEventEmitter, EventMap } from '../EventEmitter/EventEmitter'
 import { UnreadUserMessages, User } from '../EventEmitter/types'
 
@@ -77,7 +78,12 @@ export class UserList extends CustomEventEmitter<EventMap> {
 
   addUser(user: User) {
     const userWrapper = createElement('div', 'user-wrapper')
-    const userDiv = createElement('div', 'user-status', user.login, user.login)
+    const userDiv = createElement(
+      'div',
+      'user-status',
+      truncateWithEllipses(user.login),
+      user.login,
+    )
     const statusCircle = createElement('span', 'status')
     statusCircle.style.backgroundColor = user.isLogined ? 'green' : 'red'
 

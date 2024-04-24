@@ -40,7 +40,7 @@ export class Footer {
     if (!this.catElement) return
     this.catElement.style.display = 'inline-block'
     this.catElement.addEventListener('click', () => {
-      this.audio.src = 'meow.mp3'
+      this.audio.src = 'meow4.mp3'
       this.audio.volume = 0.3
       this.audio.play()
     })

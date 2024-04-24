@@ -1,6 +1,7 @@
 import { router } from '../../Router/AppRouter'
 import ws, { WebSocketClient } from '../../Service/WebSocketClient'
 import { createElement } from '../../Utils/createElement'
+import { truncateWithEllipses } from '../../Utils/truncate'
 import {
   ActiveUsersList,
   HistoryOfMessages,
@@ -17,6 +18,7 @@ import {
   User,
 } from '../EventEmitter/types'
 import { Loader } from '../Loader'
+import modal, { ModalWindow } from '../Modal'
 import { userData } from '../StartPage'
 import { Toast } from '../toast'
 import { ActiveChat } from './ActiveChat'
@@ -60,6 +62,7 @@ export class MainPage {
   divider: HTMLDivElement | undefined
   messageCard: MessageCard
   editModeId: string = ''
+  modal: ModalWindow = modal
 
   constructor() {
     this.header = new Header()
@@ -78,7 +81,12 @@ export class MainPage {
         }
       })
     }
-    this.activeChat.bindHandleMessage(this.handleSenderMessage.bind(this))
+    this.activeChat.bindHandleMessage()
+
+    this.modal.on('deleteClicked', this.deleteMessage.bind(this))
+
+    this.modal.on('editClicked', this.editMessage.bind(this))
+
     this.activeChat.bindCancelButton(this.cancelEditing.bind(this))
     if (!this.webSocketClient.isOpen()) {
       this.webSocketClient.connect()
@@ -99,8 +107,8 @@ export class MainPage {
       this.userAuthData.firstName = JSON.parse(MrrrChatUserData).firstName
       this.userAuthData.firstName = JSON.parse(MrrrChatUserData).password
 
-      if (this.header.nameContainer) {
-        this.header.nameContainer.textContent = `User name: ${this.user}`
+      if (this.header.nameContainer && this.user) {
+        this.header.nameContainer.textContent = `User name: ${truncateWithEllipses(this.user)}`
       }
       if (this.webSocketClient.isOpen()) {
         this.isOnline = false
@@ -189,6 +197,7 @@ export class MainPage {
       'WEBSOCKET_OPEN',
       this.sendInitialRequests.bind(this),
     )
+    this.loader.hideLoader()
   }
 
   sendInitialRequests() {
@@ -235,7 +244,7 @@ export class MainPage {
         ) {
           this.activeChat.startChatPanel.style.height = '35px'
           const status = user.isLogined ? 'online' : 'offline'
-          this.activeChat.startChatPanel.textContent = `${user.login}, ${status}`
+          this.activeChat.startChatPanel.textContent = `${truncateWithEllipses(user.login)}, ${status}`
           this.activeChat.activeChat.style.display = 'flex'
           this.activeChat.rightInputContainer.style.display = 'flex'
         }
@@ -296,7 +305,7 @@ export class MainPage {
     this.webSocketClient.getAllUnauthUsers()
     if (event.payload.user.login === this.activeChatLogin) {
       if (!this.activeChat.startChatPanel) return
-      this.activeChat.startChatPanel.textContent = `${this.activeChatLogin}, online`
+      this.activeChat.startChatPanel.textContent = `${truncateWithEllipses(this.activeChatLogin)}, online`
       if (this.id && this.activeChatLogin) {
         this.webSocketClient.getHistory(this.id, this.activeChatLogin)
       }
@@ -310,7 +319,7 @@ export class MainPage {
     this.webSocketClient.getAllUnauthUsers()
     if (event.payload.user.login === this.activeChatLogin) {
       if (!this.activeChat.startChatPanel) return
-      this.activeChat.startChatPanel.textContent = `${this.activeChatLogin}, offline`
+      this.activeChat.startChatPanel.textContent = `${truncateWithEllipses(this.activeChatLogin)}, offline`
     }
   }
   sendMessage() {
@@ -348,10 +357,16 @@ export class MainPage {
     const message = event.payload.message
     if (!this.user) return
     if (
-      message.to === this.activeChatLogin && // получатель === активный чат
+      message.to === this.activeChatLogin && // получатель === активный чат, исходящее
       this.activeChat.activeChat &&
       this.activeChat.activeChat.style.display !== 'none'
     ) {
+      if (
+        this.activeChat.activeChat.textContent ===
+        'Start to chat with your friend'
+      ) {
+        this.activeChat.activeChat.textContent = ''
+      }
       const messageElement = this.messageCard.createMessageElement(
         message,
         this.user,
@@ -360,7 +375,7 @@ export class MainPage {
       this.activeChat.activeChat.append(messageElement)
       messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' })
     } else if (
-      message.from === this.activeChatLogin && // отправитель === активный чат
+      message.from === this.activeChatLogin && // отправитель === активный чат, входящее
       this.activeChat.activeChat &&
       this.activeChat.activeChat.style.display !== 'none'
     ) {
@@ -370,9 +385,23 @@ export class MainPage {
         this.activeChatLogin,
       )
       this.activeChat.activeChat.append(messageElement)
-      messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' })
 
-      if (this.id) this.webSocketClient.markMessageAsRead(this.id, message.id)
+      if (this.userList) {
+        const existingUser = this.userList.userMessages.find(
+          (u) => u.login === message.from,
+        )
+        if (this.id && existingUser && existingUser.newMessages.length === 0) {
+          this.webSocketClient.markMessageAsRead(this.id, message.id)
+          messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' })
+        } else if (
+          this.id &&
+          existingUser &&
+          existingUser.newMessages.length !== 0
+        ) {
+          existingUser.newMessages.push(message.id)
+          this.userList.updateUnreadMessagesNumber()
+        }
+      }
     } else if (message.from !== this.activeChatLogin && this.userList) {
       const existingUser = this.userList.userMessages.find(
         (u) => u.login === message.from,
@@ -437,7 +466,7 @@ export class MainPage {
       'Connection with server lost, trying to reconnect...',
     )
     this.loader.init()
-    this.loader.showLoader(5000, 'Loading...')
+    this.loader.showLoader(30000, 'Loading...')
   }
 
   isFirstNewMessage(message: Message, messages: Message[]) {
@@ -547,14 +576,6 @@ export class MainPage {
       this.userList.updateUnreadMessagesNumber()
     }
   }
-  handleSenderMessage(process: string, id: string) {
-    if (process === 'delete') {
-      this.deleteMessage(id)
-    }
-    if (process === 'edit') {
-      this.editMessage(id)
-    }
-  }
 
   handleMessageDelete(event: MessageDeleted) {
     this.updateUnreadMessages(event)
@@ -569,15 +590,23 @@ export class MainPage {
     }
   }
 
-  deleteMessage(id: string) {
+  deleteMessage(event: string) {
     if (this.id) {
-        this.webSocketClient.deleteMessage(this.id, id)
+      this.webSocketClient.deleteMessage(this.id, event)
+    }
+    if (
+      this.activeChat.mainInput &&
+      this.activeChat.inputWrapper &&
+      this.activeChat.cancelButton
+    ) {
+      this.activeChat.mainInput.value = ''
+      this.activeChat.inputWrapper.removeChild(this.activeChat.cancelButton)
     }
   }
 
-  editMessage(id: string) {
+  editMessage(event: string) {
     if (!this.id) return
-    const textContainer = document.getElementById(id)
+    const textContainer = document.getElementById(event)
     if (textContainer) {
       const thirdChildElement = textContainer.children[2]
       if (!thirdChildElement.firstChild) return
@@ -589,7 +618,7 @@ export class MainPage {
         this.activeChat.inputWrapper
       ) {
         this.activeChat.mainInput.value = text
-        this.editModeId = id
+        this.editModeId = event
         this.activeChat.inputWrapper.append(this.activeChat.cancelButton)
         this.activeChat.unableSendButton()
       }
