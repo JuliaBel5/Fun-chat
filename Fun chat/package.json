@@ -11,11 +11,23 @@
     "lint:fix": "eslint \"src/**/*.{js,mjs,cjs,ts,mts}\" --fix"
   },
   "devDependencies": {
+    "@eslint/js": "^9.1.1",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
     "eslint": "^8.57.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-typescript": "^18.0.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-kit": "^10.27.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "globals": "^15.0.0",
     "prettier": "^3.2.5",
     "sass": "^1.75.0",
     "typescript": "^5.2.2",
+    "typescript-eslint": "^7.7.1",
     "vite": "^5.2.0"
   },
   "dependencies": {

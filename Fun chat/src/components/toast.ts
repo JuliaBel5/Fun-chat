@@ -1,66 +1,65 @@
-import { createElement } from '../Utils/createElement'
+import { createElement } from '../Utils/createElement';
 
-type HandlerFunction = () => void
+type HandlerFunction = () => void;
 
 export class Toast {
-  private toastContainer: HTMLElement
+  private toastContainer: HTMLElement;
 
-  confirmButton: HTMLButtonElement
+  confirmButton: HTMLButtonElement;
 
-  cancelButton: HTMLButtonElement
+  cancelButton: HTMLButtonElement;
 
-  toast: HTMLDivElement
+  toast: HTMLDivElement;
 
-  buttonContainer: HTMLDivElement
+  buttonContainer: HTMLDivElement;
 
-  timeoutId: number | undefined
+  timeoutId: number | undefined;
 
-  audio: HTMLAudioElement
+  audio: HTMLAudioElement;
 
   constructor() {
-    this.toastContainer = createElement('div', 'toast-container', '')
-    document.body.append(this.toastContainer)
-    this.buttonContainer = createElement('div', 'toast-button-container')
-    this.confirmButton = createElement('button', 'toast-confirm-button', 'Yes')
-    this.cancelButton = createElement('button', 'toast-cancel-button', 'No')
-    this.toast = createElement('div', 'toast', '')
-    this.buttonContainer.append(this.confirmButton, this.cancelButton)
-    this.toastContainer.append(this.toast, this.buttonContainer)
-    this.audio = new Audio()
+    this.toastContainer = createElement('div', 'toast-container', '');
+    document.body.append(this.toastContainer);
+    this.buttonContainer = createElement('div', 'toast-button-container');
+    this.confirmButton = createElement('button', 'toast-confirm-button', 'Yes');
+    this.cancelButton = createElement('button', 'toast-cancel-button', 'No');
+    this.toast = createElement('div', 'toast', '');
+    this.buttonContainer.append(this.confirmButton, this.cancelButton);
+    this.toastContainer.append(this.toast, this.buttonContainer);
+    this.audio = new Audio();
     this.cancelButton.addEventListener('click', () => {
-      this.toastContainer.classList.remove('show')
-      this.audio.src = 'click.mp3'
-      this.audio.play()
-      clearTimeout(this.timeoutId)
-    })
+      this.toastContainer.classList.remove('show');
+      this.audio.src = 'click.mp3';
+      this.audio.play();
+      clearTimeout(this.timeoutId);
+    });
   }
 
   public show = (message: string, duration = 3000): void => {
-    this.toastContainer.classList.add('show')
-    this.toast.textContent = message
-    this.confirmButton.style.display = 'flex'
-    this.cancelButton.style.display = 'flex'
+    this.toastContainer.classList.add('show');
+    this.toast.textContent = message;
+    this.confirmButton.style.display = 'flex';
+    this.cancelButton.style.display = 'flex';
     this.timeoutId = setTimeout(() => {
-      this.toastContainer.classList.remove('show')
-    }, duration)
-  }
+      this.toastContainer.classList.remove('show');
+    }, duration);
+  };
 
   public showNotification = (message: string, duration = 3000): void => {
-    this.toastContainer.classList.add('show')
-    this.toast.textContent = message
-    this.toast.style.textAlign = 'center'
-    this.cancelButton.style.display = 'none'
-    this.confirmButton.style.display = 'none'
+    this.toastContainer.classList.add('show');
+    this.toast.textContent = message;
+    this.toast.style.textAlign = 'center';
+    this.cancelButton.style.display = 'none';
+    this.confirmButton.style.display = 'none';
     this.timeoutId = setTimeout(() => {
-      this.toastContainer.classList.remove('show')
-    }, duration)
-  }
+      this.toastContainer.classList.remove('show');
+    }, duration);
+  };
 
-  bindConfirmButton = (handler: HandlerFunction) =>
-    this.confirmButton.addEventListener('click', () => {
-      this.audio.src = 'click.mp3'
-      this.audio.play()
-      this.toastContainer.classList.remove('show')
-      handler()
-    })
+  bindConfirmButton = (handler: HandlerFunction) => this.confirmButton.addEventListener('click', () => {
+    this.audio.src = 'click.mp3';
+    this.audio.play();
+    this.toastContainer.classList.remove('show');
+    handler();
+  });
 }

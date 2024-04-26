@@ -15,47 +15,31 @@ import {
   User,
   UserLogin,
   UserLogout,
-} from './types'
+} from './types';
 
 export class CustomEventEmitter<T extends EventMap>
-  implements CustomEventEmitterInt<T>
-{
-  protected events: { [K in keyof T]?: Array<EventReceiver<T[K]>> } = {}
+  implements CustomEventEmitterInt<T> {
+  protected events: { [K in keyof T]?: Array<EventReceiver<T[K]>> } = {};
 
   on<K extends EventKey<T>>(eventName: K, listener: EventReceiver<T[K]>): void {
     if (!this.events[eventName]) {
-      this.events[eventName] = []
+      this.events[eventName] = [];
     }
-    this.events[eventName]!.push(listener)
+    this.events[eventName]!.push(listener);
   }
 
   emit<K extends EventKey<T>>(eventName: K, params: T[K]): void {
     if (this.events[eventName]) {
-      this.events[eventName]!.forEach((listener) => listener(params))
+      this.events[eventName]!.forEach((listener) => listener(params));
     }
   }
 
   removeAllListeners(): void {
-    for (const eventName in this.events) {
-      if (
-        this.events.hasOwnProperty(eventName) &&
-        eventName !== 'WEBSOCKET_OPEN'
-      ) {
-        this.events[eventName as keyof T] = []
+    Object.keys(this.events).forEach((eventName) => {
+      if (eventName !== 'WEBSOCKET_OPEN') {
+        this.events[eventName as keyof T] = [];
       }
-    }
-  }
-
-  removeWEBSOCKET_OPENeventListener(): void {
-    for (const eventName in this.events) {
-      if (
-        this.events.hasOwnProperty(eventName) &&
-        eventName === 'WEBSOCKET_OPEN'
-      ) {
-        console.log(this.events[eventName as keyof T])
-        this.events[eventName as keyof T] = []
-      }
-    }
+    });
   }
 
   public removeListener(
@@ -63,10 +47,10 @@ export class CustomEventEmitter<T extends EventMap>
     listener: EventReceiver<EventMap[keyof EventMap]>,
   ): void {
     if (this.events[eventName]) {
-      const listeners = this.events[eventName]
-      const index = listeners?.indexOf(listener)
+      const listeners = this.events[eventName];
+      const index = listeners?.indexOf(listener);
       if (index && index > -1) {
-        listeners?.splice(index, 1)
+        listeners?.splice(index, 1);
       }
     }
   }
@@ -93,8 +77,8 @@ export interface EventMap {
   editClicked: string
 }
 
-export type EventKey<T> = keyof T
-export type EventReceiver<T> = (params: T) => void
+export type EventKey<T> = keyof T;
+export type EventReceiver<T> = (params: T) => void;
 
 export interface CustomEventEmitterInt<T extends EventMap> {
   on<K extends EventKey<T>>(eventName: K, listener: EventReceiver<T[K]>): void

@@ -1,4 +1,4 @@
-import './styles.scss'
-import { router } from './Router/AppRouter'
+import './styles.scss';
+import { router } from './Router/AppRouter';
 
-export const appRouter = router
+export const appRouter = router;

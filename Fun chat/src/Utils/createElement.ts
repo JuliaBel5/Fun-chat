@@ -4,21 +4,21 @@ export function createElement<T extends keyof HTMLElementTagNameMap>(
   content = '',
   id?: string,
 ): HTMLElementTagNameMap[T] {
-  const element = document.createElement(tag)
+  const element = document.createElement(tag);
 
   if (className) {
-    element.className = className
+    element.className = className;
   }
 
   if (content) {
-    element.textContent = content
+    element.textContent = content;
   }
 
   if (id) {
-    element.id = id
+    element.id = id;
   }
 
-  return element
+  return element;
 }
 
 export function createInputElement<T extends keyof HTMLElementTagNameMap>(
@@ -28,14 +28,14 @@ export function createInputElement<T extends keyof HTMLElementTagNameMap>(
   id?: string,
   attributes: Record<string, string | boolean> = {},
 ): HTMLElementTagNameMap[T] {
-  const element = document.createElement(tag)
-  if (className) element.classList.add(className)
-  if (content) element.textContent = content
-  if (id) element.id = id
-  for (const key in attributes) {
-    element.setAttribute(key, attributes[key].toString())
-  }
-  return element
+  const element = document.createElement(tag);
+  if (className) element.classList.add(className);
+  if (content) element.textContent = content;
+  if (id) element.id = id;
+  Object.keys(attributes).forEach((key) => {
+    element.setAttribute(key, attributes[key].toString());
+  });
+  return element;
 }
 
 export function createLinkedImage(
@@ -44,16 +44,16 @@ export function createLinkedImage(
   href: string,
   image: string,
 ): HTMLElement {
-  const element = document.createElement(tag)
-  element.className = className
+  const element = document.createElement(tag);
+  element.className = className;
   if (element && element instanceof HTMLImageElement) {
-    element.src = image
+    element.src = image;
   }
-  const link = document.createElement('a')
-  link.href = href
-  link.target = '_blank'
-  link.append(element)
-  return link
+  const link = document.createElement('a');
+  link.href = href;
+  link.target = '_blank';
+  link.append(element);
+  return link;
 }
 
 export function createLinkedElement(
@@ -61,11 +61,11 @@ export function createLinkedElement(
   className: string,
   href: string,
 ): HTMLElement {
-  const element = document.createElement(tag)
-  element.className = className
-  const link = document.createElement('a')
-  link.href = href
-  link.target = '_blank'
-  link.append(element)
-  return link
+  const element = document.createElement(tag);
+  element.className = className;
+  const link = document.createElement('a');
+  link.href = href;
+  link.target = '_blank';
+  link.append(element);
+  return link;
 }

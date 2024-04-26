@@ -1,10 +1,10 @@
-import { SessionStorageApi } from './Storage'
+import { SessionStorageApi } from './Storage';
 
 export interface LoginDataType {
   login: string
   password: string
 }
 
-const UserStore = new SessionStorageApi<LoginDataType>('authData')
+const UserStore = new SessionStorageApi<LoginDataType>('authData');
 
-export default UserStore
+export default UserStore;
