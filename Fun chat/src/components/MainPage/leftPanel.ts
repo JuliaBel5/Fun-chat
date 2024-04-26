@@ -44,22 +44,20 @@ export class UserList extends CustomEventEmitter<EventMap> {
   }
 
   public updateActiveUsersList(users: User[]): void {
-    if (this.usersContainer) {
-      this.usersContainer.innerHTML = ''
-      this.usersList = []
-      const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser')
-      if (MrrrChatUserData) {
-        this.user = JSON.parse(MrrrChatUserData).firstName
-      }
-
-      users.forEach((user) => {
-        if (user.login !== this.user) {
-          const wrappedUser = this.addUser(user)
-          this.updateUserMessages(user)
-          this.usersList.push(wrappedUser)
-        }
-      })
+    this.usersContainer.innerHTML = ''
+    this.usersList = []
+    const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser')
+    if (MrrrChatUserData) {
+      this.user = JSON.parse(MrrrChatUserData).firstName
     }
+
+    users.forEach((user) => {
+      if (user.login !== this.user) {
+        const wrappedUser = this.addUser(user)
+        this.updateUserMessages(user)
+        this.usersList.push(wrappedUser)
+      }
+    })
   }
 
   public updateInactiveUsersList(users: User[]): void {

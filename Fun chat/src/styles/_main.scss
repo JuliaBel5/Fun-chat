@@ -149,7 +149,7 @@
   height: 35px;
   width: 100%;
   border-radius: 7px;
-  padding-right: 10px;
+  padding-right: 20px;
 }
 
 
@@ -201,24 +201,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  right: -2%;
-  top: 3%;
+  right: -3%;
+  top: 25%;
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  background-color: rgba(114, 54, 64, 0.8);
+  background-color: rgba(245, 218, 223, 0.8);
   text-align: center;
-  font-size: 18px;
-  font-weight: 600;
+  line-height: 0;
+  font-size: 26px;
+  font-weight: 400;
   border: 1px solid $redBook;
-  color: rgb(251, 247, 247);
+  color: rgb(19, 15, 15);
   z-index: 25;
+  padding-bottom: 5px;
 
 }
 
 .cancel-button:hover {
-  color: yellow;
-  border: 1px solid rgb(234, 160, 42);
+  color: rgb(9, 75, 39);
+  background-color: rgba(241, 169, 183, 0.8);
+  border: 1px solid rgb(62, 3, 15);
 }
 
 .submit {

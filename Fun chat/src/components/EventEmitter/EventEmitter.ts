@@ -57,6 +57,7 @@ export class CustomEventEmitter<T extends EventMap>
       }
     }
   }
+
   public removeListener(
     eventName: keyof EventMap,
     listener: EventReceiver<EventMap[keyof EventMap]>,

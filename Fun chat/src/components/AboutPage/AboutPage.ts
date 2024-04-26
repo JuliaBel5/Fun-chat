@@ -24,11 +24,9 @@ export class AboutPage {
     const leftPanel = createElement('div', 'leftStartPanel')
     leftPanel.style.cursor = 'pointer'
     leftPanel.addEventListener('click', () => {
-      if (this.audio) {
-        this.audio.src = 'meow3.mp3'
-        this.audio.volume = 0.3
-        this.audio.play()
-      }
+      this.audio.src = 'meow3.mp3'
+      this.audio.volume = 0.3
+      this.audio.play()
     })
     const rightPanel = createElement('div', 'rightStartPanel')
 

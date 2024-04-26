@@ -19,13 +19,13 @@ import {
 } from '../EventEmitter/types'
 import { Loader } from '../Loader'
 import modal, { ModalWindow } from '../Modal'
-import { userData } from '../StartPage'
+import { UserData } from '../StartPage'
 import { Toast } from '../toast'
 import { ActiveChat } from './ActiveChat'
-import { MessageCard } from './MessageCard'
 import { Footer } from './footer'
 import { Header } from './header'
 import { UserList } from './leftPanel'
+import { MessageCard } from './MessageCard'
 
 export class MainPage {
   gameArea: HTMLDivElement | undefined
@@ -51,17 +51,14 @@ export class MainPage {
   inactiveUsers: User[] | undefined
   id: string | undefined
   activeChatLogin: string | undefined
-  router:
-    | import('d:/Julia/AHTML/RS school/Stage 1/St1 2/Fun chat/juliabel5-JSFE2023Q4/Fun chat/src/Router/AppRouter').AppRouter
-    | undefined
 
   isOnline: boolean
-  userAuthData: userData = { firstName: '', password: '' }
+  userAuthData: UserData = { firstName: '', password: '' }
   footer: Footer = new Footer()
-  loader: any
+  loader: Loader
   divider: HTMLDivElement | undefined
   messageCard: MessageCard
-  editModeId: string = ''
+  editModeId = ''
   modal: ModalWindow = modal
 
   constructor() {
@@ -91,12 +88,11 @@ export class MainPage {
     if (!this.webSocketClient.isOpen()) {
       this.webSocketClient.connect()
     }
-
+    this.messageCard = new MessageCard()
     this.activeUsers = []
     this.inactiveUsers = []
     this.setupEventListeners()
     this.isOnline = false
-    this.messageCard = new MessageCard()
   }
 
   init() {
@@ -112,7 +108,11 @@ export class MainPage {
       }
       if (this.webSocketClient.isOpen()) {
         this.isOnline = false
+
         this.loader.hideLoader()
+      }
+      if (!this.webSocketClient.isOpen()) {
+        this.isOnline = false
       }
       this.startChat()
     }
@@ -187,9 +187,7 @@ export class MainPage {
   }
 
   confirm = () => {
-    if (this.toast) {
-      this.toast.show(`Are you sure you want to logout, ${this.user}?`)
-    }
+    this.toast.show(`Are you sure you want to logout, ${this.user}?`)
   }
 
   setupEventListeners() {
@@ -217,18 +215,23 @@ export class MainPage {
       this.externalUserLogout.bind(this),
     )
     this.webSocketClient.on('WEBSOCKET_CLOSED', this.reconnect.bind(this))
-    this.router = router
 
-    this.webSocketClient.on('USER_LOGOUT', () => this.router?.goToLogin())
-    this.webSocketClient.on('USER_LOGIN', () => this.router?.navigate())
+    this.webSocketClient.on('USER_LOGOUT', () => router.goToLogin())
+    this.webSocketClient.on('USER_LOGIN', () => router.navigate())
 
     this.webSocketClient.on('MSG_SEND', this.receiveMessage.bind(this))
     this.webSocketClient.on('MSG_FROM_USER', this.getHistory.bind(this)) // событие отправки массива сообщений с конкретным пользователем
     this.webSocketClient.on('MSG_READ', this.updateUnreadMessages.bind(this))
-    this.webSocketClient.on('MSG_DELIVER', this.changeDeliveryStatus.bind(this))
+    this.webSocketClient.on('MSG_DELIVER', this.updateChatHistory.bind(this))
     this.webSocketClient.on('MSG_DELETE', this.handleMessageDelete.bind(this))
-    this.webSocketClient.on('MSG_EDIT', this.handleMessageEdit.bind(this))
-
+    this.webSocketClient.on('MSG_EDIT', this.updateChatHistory.bind(this))
+    const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser')
+    if (MrrrChatUserData) {
+      this.user = JSON.parse(MrrrChatUserData).firstName
+      this.password = JSON.parse(MrrrChatUserData).password
+      this.userAuthData.firstName = JSON.parse(MrrrChatUserData).firstName
+      this.userAuthData.firstName = JSON.parse(MrrrChatUserData).password
+    }
     if (this.user && this.password && !this.isOnline) {
       this.id = this.generateUniqueTimestampID()
       this.webSocketClient.loginUser(this.id, this.user, this.password)
@@ -322,6 +325,7 @@ export class MainPage {
       this.activeChat.startChatPanel.textContent = `${truncateWithEllipses(this.activeChatLogin)}, offline`
     }
   }
+
   sendMessage() {
     if (
       this.activeChat.activeChat &&
@@ -335,24 +339,23 @@ export class MainPage {
         if (this.id && this.activeChatLogin) {
           this.webSocketClient.sendMessage(this.id, this.activeChatLogin, text)
         }
-      } else {
-        if (
-          this.id &&
-          this.editModeId &&
-          this.activeChat.cancelButton &&
-          this.activeChat.inputWrapper
-        ) {
-          const text = this.activeChat.mainInput.value
-          this.webSocketClient.editMessage(this.id, this.editModeId, text)
-          this.editModeId = ''
-          this.activeChat.inputWrapper.removeChild(this.activeChat.cancelButton)
-        }
+      } else if (
+        this.id &&
+        this.editModeId &&
+        this.activeChat.cancelButton &&
+        this.activeChat.inputWrapper
+      ) {
+        const text = this.activeChat.mainInput.value
+        this.webSocketClient.editMessage(this.id, this.editModeId, text)
+        this.editModeId = ''
+        this.activeChat.cancelButton.remove()
       }
       this.activeChat.mainInput.value = ''
       this.activeChat.sendButton.classList.remove('submit')
       this.activeChat.sendButton.classList.add('disabled-submit')
     }
   }
+
   receiveMessage(event: MessageSentFromUser | MessageSent) {
     const message = event.payload.message
     if (!this.user) return
@@ -396,7 +399,7 @@ export class MainPage {
         } else if (
           this.id &&
           existingUser &&
-          existingUser.newMessages.length !== 0
+          existingUser.newMessages.length > 0
         ) {
           existingUser.newMessages.push(message.id)
           this.userList.updateUnreadMessagesNumber()
@@ -410,6 +413,7 @@ export class MainPage {
       this.userList.updateUnreadMessagesNumber()
     }
   }
+
   fetchMessageHistory() {
     if (this.activeUsers && this.inactiveUsers) {
       const arr = this.activeUsers.concat(this.inactiveUsers)
@@ -448,16 +452,11 @@ export class MainPage {
           this.handleUnreadMessages(message, activeUser)
         })
       }
-    } else {
-      if (
-        this.activeChat.activeChat?.style.display === 'none' ||
-        !this.activeChat.activeChat
-      ) {
-        return
-      } else {
-        this.activeChat.activeChat.textContent =
-          'Start to chat with your friend'
-      }
+    } else if (
+      this.activeChat.activeChat?.style.display !== 'none' &&
+      this.activeChat.activeChat
+    ) {
+      this.activeChat.activeChat.textContent = 'Start to chat with your friend'
     }
   }
 
@@ -466,7 +465,7 @@ export class MainPage {
       'Connection with server lost, trying to reconnect...',
     )
     this.loader.init()
-    this.loader.showLoader(30000, 'Loading...')
+    this.loader.showLoader(300000, 'Loading...')
   }
 
   isFirstNewMessage(message: Message, messages: Message[]) {
@@ -520,14 +519,15 @@ export class MainPage {
       }
     }
   }
-  hideActiveChat(event: { target: any }) {
-    if (this.activeChat) {
+
+  hideActiveChat(event: MouseEvent) {
+    if (event.target instanceof HTMLElement) {
       this.activeChatLogin = ''
-      this.activeChat.hideActiveChat(event)
+      this.activeChat.hideActiveChat(event.target)
     }
   }
 
-  changeDeliveryStatus() {
+  updateChatHistory() {
     if (this.id && this.activeChatLogin) {
       this.webSocketClient.getHistory(this.id, this.activeChatLogin)
     }
@@ -584,56 +584,20 @@ export class MainPage {
     }
   }
 
-  handleMessageEdit() {
-    if (this.id && this.activeChatLogin) {
-      this.webSocketClient.getHistory(this.id, this.activeChatLogin)
-    }
-  }
-
   deleteMessage(event: string) {
     if (this.id) {
       this.webSocketClient.deleteMessage(this.id, event)
     }
-    if (
-      this.activeChat.mainInput &&
-      this.activeChat.inputWrapper &&
-      this.activeChat.cancelButton
-    ) {
-      this.activeChat.mainInput.value = ''
-      this.activeChat.inputWrapper.removeChild(this.activeChat.cancelButton)
-    }
+    this.activeChat.deleteMessage()
   }
 
   editMessage(event: string) {
-    if (!this.id) return
-    const textContainer = document.getElementById(event)
-    if (textContainer) {
-      const thirdChildElement = textContainer.children[2]
-      if (!thirdChildElement.firstChild) return
-      const text = thirdChildElement.firstChild.textContent
-      if (
-        this.activeChat.mainInput &&
-        text &&
-        this.activeChat.cancelButton &&
-        this.activeChat.inputWrapper
-      ) {
-        this.activeChat.mainInput.value = text
-        this.editModeId = event
-        this.activeChat.inputWrapper.append(this.activeChat.cancelButton)
-        this.activeChat.unableSendButton()
-      }
-    }
+    this.editModeId = event
+    this.activeChat.editMessage(event)
   }
+
   cancelEditing() {
-    if (
-      this.activeChat.mainInput &&
-      this.activeChat.cancelButton &&
-      this.activeChat.inputWrapper
-    ) {
-      this.activeChat.mainInput.value = ''
-      this.editModeId = ''
-      this.activeChat.inputWrapper.removeChild(this.activeChat.cancelButton)
-      this.activeChat.disableSendButton()
-    }
+    this.editModeId = ''
+    this.activeChat.cancelEditing()
   }
 }

@@ -176,13 +176,13 @@ export interface ErrorMessage {
   }
 }
 
-export type MessageStatus = {
+export interface MessageStatus {
   isDelivered: boolean
   isEdited: boolean
   isReaded: boolean
 }
 
-export type Message = {
+export interface Message {
   datetime: number
   from: string
   id: string
@@ -191,7 +191,7 @@ export type Message = {
   to: string
 }
 
-export type UnreadUserMessages = {
+export interface UnreadUserMessages {
   login: string
   newMessages: string[]
 }

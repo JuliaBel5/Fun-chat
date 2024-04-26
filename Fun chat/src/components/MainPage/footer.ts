@@ -8,7 +8,7 @@ export class Footer {
   footer: HTMLElement
   catElement: HTMLElement | undefined
   audio: HTMLAudioElement
-  nameContainer: HTMLDivElement | undefined
+  nameContainer: HTMLElement | undefined
   titleContainer: HTMLDivElement | undefined
   schoolLogo: HTMLElement | undefined
   schoolContainer: HTMLDivElement | undefined
@@ -21,11 +21,14 @@ export class Footer {
 
   init(): void {
     this.schoolContainer = createElement('div', 'school-container')
-    this.nameContainer = createElement(
+    this.nameContainer = createLinkedElement(
       'div',
       'schoolname-container',
-      'RSSchool',
+      'https://rs.school/courses/javascript-mentoring-program',
     )
+
+    this.nameContainer.textContent = 'RSSchool'
+
     this.schoolLogo = createLinkedElement(
       'div',
       'school-logo',
@@ -37,7 +40,7 @@ export class Footer {
       'https://github.com/JuliaBel5',
       'github.png',
     )
-    if (!this.catElement) return
+
     this.catElement.style.display = 'inline-block'
     this.catElement.addEventListener('click', () => {
       this.audio.src = 'meow4.mp3'

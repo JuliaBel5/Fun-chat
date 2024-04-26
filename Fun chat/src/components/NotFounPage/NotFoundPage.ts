@@ -4,8 +4,6 @@ export class NotFoundPage {
   gameArea: HTMLDivElement | undefined
   audio: HTMLAudioElement | undefined
 
-  constructor() {}
-
   init() {
     this.audio = new Audio()
     this.gameArea = createElement('div', 'gamearea')

@@ -51,7 +51,7 @@ export class Header {
   }
 
   bindLogout = (handler: HandlerFunction): void => {
-    if (this.logout && this.audio) {
+    if (this.logout) {
       this.logout.addEventListener('click', () => {
         this.audio.src = 'meow6.mp3'
         this.audio.volume = 0.3
@@ -63,9 +63,7 @@ export class Header {
   }
 
   remove() {
-    if (this.header) {
-      this.header.remove()
-    }
+    this.header.remove()
   }
 
   bindGoAboutButton = (handler: HandlerFunction): void => {

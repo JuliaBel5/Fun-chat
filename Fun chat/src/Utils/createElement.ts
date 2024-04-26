@@ -51,6 +51,7 @@ export function createLinkedImage(
   }
   const link = document.createElement('a')
   link.href = href
+  link.target = '_blank'
   link.append(element)
   return link
 }
@@ -64,6 +65,7 @@ export function createLinkedElement(
   element.className = className
   const link = document.createElement('a')
   link.href = href
+  link.target = '_blank'
   link.append(element)
   return link
 }

@@ -16,7 +16,7 @@ export class Loader {
     this.overlay = createElement('div', 'loading-overlay')
   }
 
-  showLoader = (delay = 30000, message?: string) => {
+  showLoader = (delay = 300000, message?: string) => {
     if (!this.overlay || !this.loader) return
     document.body.append(this.overlay, this.loader)
     if (message) {

@@ -42,9 +42,9 @@ export class MessageCard {
     const delivered = createElement('div', 'delivered')
     if (!message.status.isDelivered) {
       delivered.textContent = 'Sent'
-    } else if (message.status.isDelivered && !message.status.isReaded) {
+    } else if (!message.status.isReaded) {
       delivered.textContent = 'Delivered'
-    } else if (message.status.isDelivered && message.status.isReaded) {
+    } else {
       delivered.textContent = 'Read'
     }
 

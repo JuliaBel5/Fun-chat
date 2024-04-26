@@ -1,5 +1,6 @@
 import { createElement } from '../Utils/createElement'
 import { CustomEventEmitter, EventMap } from './EventEmitter/EventEmitter'
+
 type HandlerFunction = () => void
 
 export class ModalWindow extends CustomEventEmitter<EventMap> {
@@ -37,7 +38,9 @@ export class ModalWindow extends CustomEventEmitter<EventMap> {
 
   show(_event: MouseEvent, element: HTMLElement) {
     this.element = element
-    this.isActive ? (this.isActive = false) : (this.isActive = true)
+    this.isActive = this.isActive
+      ? (this.isActive = false)
+      : (this.isActive = true)
     if (this.isActive) {
       this.modal.style.display = 'flex'
       /*    const clientY = event.clientY

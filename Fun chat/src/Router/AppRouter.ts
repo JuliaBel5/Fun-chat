@@ -43,9 +43,8 @@ export class AppRouter {
       '/404': this.notFound,
     }
 
-    if (this.loginPage) {
-      this.loginPage.bindGoAboutButton(this.goToAbout)
-    }
+    this.loginPage.bindGoAboutButton(this.goToAbout)
+
     if (this.main.header.goToAbout) {
       this.main.header.bindGoAboutButton(this.goToAbout)
     }
@@ -61,10 +60,8 @@ export class AppRouter {
     }
     if (!path) {
       const currentPath = window.location.pathname
-      if (this.routes[currentPath]) {
-        this.navigate(currentPath)
-        return
-      }
+      this.navigate(currentPath)
+      return
     }
 
     this.isAuth = this.isUserAuth()

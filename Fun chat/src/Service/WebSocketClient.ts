@@ -25,6 +25,10 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
     return this.socket.readyState === 1
   }
 
+  public close() {
+    return this.socket.close()
+  }
+
   connect(): void {
     this.socket.addEventListener('open', this.handleOpen)
     this.socket.addEventListener('message', this.handleMessage)
@@ -162,7 +166,7 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
 
   public markMessageAsRead(id: string, messageId: string): void {
     const request = {
-      id: id,
+      id,
       type: 'MSG_READ',
       payload: {
         message: {
@@ -176,7 +180,7 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
 
   public deleteMessage(id: string, messageId: string): void {
     const request = {
-      id: id,
+      id,
       type: 'MSG_DELETE',
       payload: {
         message: {
@@ -189,12 +193,12 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
 
   public editMessage(id: string, messageId: string, text: string): void {
     const request = {
-      id: id,
+      id,
       type: 'MSG_EDIT',
       payload: {
         message: {
           id: messageId,
-          text: text,
+          text,
         },
       },
     }

@@ -1,6 +1,6 @@
 import { createElement } from '../../Utils/createElement'
-
 import modal, { ModalWindow } from '../Modal'
+
 type HandlerFunction = () => void
 
 export class ActiveChat {
@@ -62,6 +62,7 @@ export class ActiveChat {
 
     this.rightInputContainer.append(this.inputWrapper, this.sendButton)
   }
+
   bindSendMessage = (handler: HandlerFunction) => {
     if (this.sendButton) {
       this.sendButton.addEventListener('click', () => handler())
@@ -94,12 +95,13 @@ export class ActiveChat {
       }
     })
   }
-  hideActiveChat(event: { target: HTMLElement }) {
+
+  hideActiveChat(target: HTMLElement) {
     if (
       this.activeChat &&
       this.rightInputContainer &&
       this.startChatPanel &&
-      event.target
+      target
     ) {
       this.activeChat.style.display = 'none'
       this.rightInputContainer.style.display = 'none'
@@ -107,6 +109,7 @@ export class ActiveChat {
       this.startChatPanel.textContent = 'Choose a friend to chat with'
     }
   }
+
   unableSendButton() {
     if (this.sendButton) {
       this.sendButton.classList.add('submit')
@@ -120,6 +123,35 @@ export class ActiveChat {
       this.sendButton.classList.remove('submit')
       this.sendButton.classList.add('disabled-submit')
       this.sendButton.disabled = true
+    }
+  }
+
+  deleteMessage() {
+    if (this.mainInput && this.inputWrapper && this.cancelButton) {
+      this.mainInput.value = ''
+      this.cancelButton.remove()
+    }
+  }
+
+  editMessage(event: string) {
+    const textContainer = document.getElementById(event)
+    if (textContainer) {
+      const thirdChildElement = textContainer.children[2]
+      if (!thirdChildElement.firstChild) return
+      const text = thirdChildElement.firstChild.textContent
+      if (this.mainInput && text && this.cancelButton && this.inputWrapper) {
+        this.mainInput.value = text
+        this.inputWrapper.append(this.cancelButton)
+        this.unableSendButton()
+      }
+    }
+  }
+
+  cancelEditing() {
+    if (this.mainInput && this.cancelButton && this.inputWrapper) {
+      this.mainInput.value = ''
+      this.cancelButton.remove()
+      this.disableSendButton()
     }
   }
 }
