@@ -51,6 +51,10 @@ export class WebSocketClient extends CustomEventEmitter<EventMap> {
     const message = JSON.parse(event.data);
     if (message.type === 'ERROR') {
       this.toast.showNotification(message.payload.error);
+      console.log(message.payload.error);
+      if (message.payload.error === 'incorrect password' || message.payload.error === 'a user with this login is already authorized') {
+        this.emit('LOGIN_FAILED', undefined);
+      }
     } else {
       this.emit(message.type, message);
     }

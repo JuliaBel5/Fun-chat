@@ -1,10 +1,12 @@
-import { Loader } from './Loader';
+import type { Loader } from './Loader';
+import loader from './Loader';
 import { LoginPage } from './LoginPage/LoginPage';
 import { MainPage, generateUniqueTimestampID } from './MainPage/MainPage';
 
 interface UserData {
-  firstName: string
+  user: string
   password: string
+  isAuth: boolean
 }
 type StartPageProps = {
   navigate: () => void,
@@ -26,7 +28,7 @@ export class Start {
   constructor(props: StartPageProps) {
     this.login = new LoginPage();
     this.main = new MainPage(props);
-    this.loader = new Loader();
+    this.loader = loader;
   }
 
   init() {
@@ -60,18 +62,18 @@ export class Start {
     const passwordValue = passwordInput.value.trim();
 
     if (firstNameValue && passwordValue && this.login.gameArea) {
-      this.userAuthData = { firstName: '', password: '' };
-      this.userAuthData.firstName = firstNameValue;
+      this.userAuthData = { user: '', password: '', isAuth: false };
+      this.userAuthData.user = firstNameValue;
       this.userAuthData.password = passwordValue;
+      this.userAuthData.isAuth = false;
+
       this.user = firstNameValue;
-      this.main.user = firstNameValue;
-      this.main.password = passwordValue;
+      this.password = passwordValue;
 
       if (this.main.userList) {
         this.main.userList.user = firstNameValue;
-        this.password = passwordValue;
         sessionStorage.setItem(
-          'MrrrChatTempUser',
+          'MrrrChatUser',
           JSON.stringify(this.userAuthData),
         );
         this.main.id = generateUniqueTimestampID();
@@ -83,7 +85,7 @@ export class Start {
           );
         }
         this.loader.init();
-        this.loader.showLoader(2000);
+        this.loader.showLoader();
       }
     }
   };

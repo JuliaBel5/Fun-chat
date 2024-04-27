@@ -1,10 +1,11 @@
 import { SessionStorageApi } from './Storage';
 
-export interface LoginDataType {
-  login: string
+export interface UserData {
+  user: string
   password: string
+  isAuth: boolean
 }
 
-const UserStore = new SessionStorageApi<LoginDataType>('authData');
+const UserStore = new SessionStorageApi<UserData>('MrrrChatUser');
 
 export default UserStore;

@@ -1,3 +1,4 @@
+import UserStore from '../../Storage/Store';
 import { createElement } from '../../Utils/createElement';
 import { truncateWithEllipses } from '../../Utils/truncate';
 import { CustomEventEmitter, EventMap } from '../EventEmitter/EventEmitter';
@@ -27,9 +28,13 @@ export class UserList extends CustomEventEmitter<EventMap> {
 
     this.usersContainer = createElement('div', 'users-container');
     this.leftInputContainer.append(this.leftInput, this.usersContainer);
-    const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
+    /* const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
+     if (MrrrChatUserData) {
+       this.user = JSON.parse(MrrrChatUserData).firstName;
+     } */
+    const MrrrChatUserData = UserStore.getData();
     if (MrrrChatUserData) {
-      this.user = JSON.parse(MrrrChatUserData).firstName;
+      this.user = MrrrChatUserData.user;
     }
     this.usersList = [];
   }
@@ -52,9 +57,13 @@ export class UserList extends CustomEventEmitter<EventMap> {
   public updateActiveUsersList(users: User[]): void {
     this.usersContainer.innerHTML = '';
     this.usersList = [];
-    const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
+    /* const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
     if (MrrrChatUserData) {
       this.user = JSON.parse(MrrrChatUserData).firstName;
+    } */
+    const MrrrChatUserData = UserStore.getData();
+    if (MrrrChatUserData) {
+      this.user = MrrrChatUserData.user;
     }
 
     users.forEach((user) => {
@@ -67,9 +76,13 @@ export class UserList extends CustomEventEmitter<EventMap> {
   }
 
   public updateInactiveUsersList(users: User[]): void {
-    const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
+    /* const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
+     if (MrrrChatUserData) {
+       this.user = JSON.parse(MrrrChatUserData).firstName;
+     } */
+    const MrrrChatUserData = UserStore.getData();
     if (MrrrChatUserData) {
-      this.user = JSON.parse(MrrrChatUserData).firstName;
+      this.user = MrrrChatUserData.user;
     }
     users.forEach((user) => {
       if (user.login !== this.user) {

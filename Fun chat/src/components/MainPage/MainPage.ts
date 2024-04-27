@@ -1,4 +1,5 @@
 import ws, { WebSocketClient } from '../../Service/WebSocketClient';
+import UserStore from '../../Storage/Store';
 import { createElement } from '../../Utils/createElement';
 import { truncateWithEllipses } from '../../Utils/truncate';
 import {
@@ -16,7 +17,8 @@ import {
   UnreadUserMessages,
   User,
 } from '../EventEmitter/types';
-import { Loader } from '../Loader';
+import type { Loader } from '../Loader';
+import loader from '../Loader';
 import modal, { ModalWindow } from '../Modal';
 import { Toast } from '../toast';
 import { ActiveChat } from './ActiveChat';
@@ -77,7 +79,7 @@ export class MainPage {
 
   isOnline: boolean;
 
-  userAuthData: UserData = { firstName: '', password: '' };
+  userAuthData: UserData = { user: '', password: '', isAuth: false };
 
   footer: Footer = new Footer();
 
@@ -94,7 +96,7 @@ export class MainPage {
   constructor(props: StartPageProps) {
     this.header = new Header();
     this.header.bindLogout(this.confirm);
-    this.loader = new Loader();
+    this.loader = loader;
     this.userList = new UserList();
     this.activeChat = new ActiveChat();
     this.toast.bindConfirmButton(this.logout);
@@ -126,24 +128,28 @@ export class MainPage {
   }
 
   init() {
-    const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
+    /* const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
     if (MrrrChatUserData) {
       this.user = JSON.parse(MrrrChatUserData).firstName;
       this.password = JSON.parse(MrrrChatUserData).password;
       this.userAuthData.firstName = JSON.parse(MrrrChatUserData).firstName;
-      this.userAuthData.firstName = JSON.parse(MrrrChatUserData).password;
+      this.userAuthData.firstName = JSON.parse(MrrrChatUserData).password; */
+    const MrrrChatUserData = UserStore.getData();
+    if (MrrrChatUserData) {
+      this.user = MrrrChatUserData.user;
+      this.password = MrrrChatUserData.password;
+      this.userAuthData.user = MrrrChatUserData.user;
+      this.userAuthData.password = MrrrChatUserData.password;
+      this.userAuthData.isAuth = MrrrChatUserData.isAuth;
 
       if (this.header.nameContainer && this.user) {
         this.header.nameContainer.textContent = `User name: ${truncateWithEllipses(this.user)}`;
       }
+      this.isOnline = false;
       if (this.webSocketClient.isOpen()) {
-        this.isOnline = false;
-
         this.loader.hideLoader();
       }
-      if (!this.webSocketClient.isOpen()) {
-        this.isOnline = false;
-      }
+
       this.startChat();
     }
   }
@@ -205,8 +211,8 @@ export class MainPage {
   }
 
   logout = () => {
-    if (this.user && this.password && this.id) {
-      this.webSocketClient.logoutUser(this.id, this.user, this.password);
+    if (this.user && this.password) {
+      this.webSocketClient.logoutUser('', this.user, this.password);
     }
     this.activeChatLogin = '';
     if (this.activeChat.startChatPanel) {
@@ -223,11 +229,12 @@ export class MainPage {
       'WEBSOCKET_OPEN',
       this.sendInitialRequests.bind(this),
     );
-    this.loader.hideLoader();
   }
 
   sendInitialRequests() {
+    this.loader.hideLoader();
     this.webSocketClient.on('USER_LOGIN', this.loginSucces.bind(this));
+    this.webSocketClient.on('LOGIN_FAILED', this.handleFailedLogin.bind(this));
     this.webSocketClient.on('USER_LOGOUT', this.logoutSucces.bind(this));
     this.webSocketClient.on('USER_ACTIVE', this.updateActiveUsers.bind(this));
     this.webSocketClient.on(
@@ -243,22 +250,21 @@ export class MainPage {
       this.externalUserLogout.bind(this),
     );
     this.webSocketClient.on('WEBSOCKET_CLOSED', this.reconnect.bind(this));
-
     this.webSocketClient.on('USER_LOGOUT', () => this.router.goToLogin());
     this.webSocketClient.on('USER_LOGIN', () => this.router.navigate());
-
     this.webSocketClient.on('MSG_SEND', this.receiveMessage.bind(this));
     this.webSocketClient.on('MSG_FROM_USER', this.getHistory.bind(this)); // событие отправки массива сообщений с конкретным пользователем
     this.webSocketClient.on('MSG_READ', this.updateUnreadMessages.bind(this));
     this.webSocketClient.on('MSG_DELIVER', this.updateChatHistory.bind(this));
     this.webSocketClient.on('MSG_DELETE', this.handleMessageDelete.bind(this));
     this.webSocketClient.on('MSG_EDIT', this.updateChatHistory.bind(this));
-    const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
+    const MrrrChatUserData = UserStore.getData();
     if (MrrrChatUserData) {
-      this.user = JSON.parse(MrrrChatUserData).firstName;
-      this.password = JSON.parse(MrrrChatUserData).password;
-      this.userAuthData.firstName = JSON.parse(MrrrChatUserData).firstName;
-      this.userAuthData.firstName = JSON.parse(MrrrChatUserData).password;
+      this.userAuthData.user = MrrrChatUserData.user;
+      this.userAuthData.password = MrrrChatUserData.password;
+      this.userAuthData.isAuth = MrrrChatUserData.isAuth;
+      this.user = MrrrChatUserData.user;
+      this.password = MrrrChatUserData.password;
     }
     if (this.user && this.password && !this.isOnline) {
       this.id = generateUniqueTimestampID();
@@ -287,26 +293,30 @@ export class MainPage {
   }
 
   loginSucces() {
-    this.isOnline = true;
-    const MrrrChatTempUserData = sessionStorage.getItem('MrrrChatTempUser');
-    if (MrrrChatTempUserData) {
-      this.userAuthData.firstName = JSON.parse(MrrrChatTempUserData).firstName;
-      this.userAuthData.password = JSON.parse(MrrrChatTempUserData).password;
-      this.user = JSON.parse(MrrrChatTempUserData).firstName;
-      this.password = JSON.parse(MrrrChatTempUserData).password;
-      sessionStorage.setItem('MrrrChatUser', JSON.stringify(this.userAuthData));
+    this.loader.hideLoader();
+    const MrrrChatUserData = UserStore.getData();
+    if (MrrrChatUserData) {
+      this.user = MrrrChatUserData.user;
+      this.password = MrrrChatUserData.password;
+      this.userAuthData.isAuth = true;
+      this.userAuthData.user = MrrrChatUserData.user;
+      this.userAuthData.password = MrrrChatUserData.password;
+      UserStore.saveData(this.userAuthData);
     }
-    sessionStorage.removeItem('MrrrChatTempUser');
+    this.isOnline = true;
     this.webSocketClient.getAllAuthUsers();
     this.webSocketClient.getAllUnauthUsers();
     console.log('логин прошел успешно');
   }
 
   logoutSucces() {
+    this.userAuthData.isAuth = false;
+    this.userAuthData.user = '';
+    this.userAuthData.user = '';
+    UserStore.removeData();
     this.isOnline = false;
     this.user = '';
     this.password = '';
-    sessionStorage.removeItem('MrrrChatUser');
     console.log('логаут прошел успешно');
   }
 
@@ -485,7 +495,7 @@ export class MainPage {
       'Connection with server lost, trying to reconnect...',
     );
     this.loader.init();
-    this.loader.showLoader(300000, 'Loading...');
+    this.loader.showLoader(30000, 'Loading...');
   }
 
   isFirstNewMessage(message: Message, messages: Message[]) {
@@ -613,5 +623,11 @@ export class MainPage {
   cancelEditing() {
     this.editModeId = '';
     this.activeChat.cancelEditing();
+  }
+
+  handleFailedLogin() {
+    this.loader.hideLoader();
+    UserStore.removeData();
+    this.router.goToLogin();
   }
 }

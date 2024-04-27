@@ -1,3 +1,4 @@
+import UserStore from '../Storage/Store';
 import { AboutPage } from '../components/AboutPage/AboutPage';
 import type { LoginPage } from '../components/LoginPage/LoginPage';
 import type { MainPage } from '../components/MainPage/MainPage';
@@ -133,8 +134,10 @@ export class AppRouter {
   };
 
   isUserAuth() {
-    const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
-    if (MrrrChatUserData) {
+    // const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
+    // if (MrrrChatUserData) {
+    const MrrrChatUserData = UserStore.getData();
+    if (MrrrChatUserData && MrrrChatUserData.isAuth) {
       this.isAuth = true;
     } else {
       this.isAuth = false;

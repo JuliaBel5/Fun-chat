@@ -37,3 +37,6 @@ export class Loader {
     this.overlay.remove();
   }
 }
+
+const loader = new Loader();
+export default loader;

@@ -1,8 +1,6 @@
 export class SessionStorageApi<D> implements IStore<D> {
-  // Ключ для взаимодействия с полем в "SessionStorageApi"
   private readonly key: string;
 
-  // ключ взаимодействия с полем "SessionStorageApi".
   constructor(key: string) {
     this.key = key;
   }

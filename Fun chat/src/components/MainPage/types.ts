@@ -1,6 +1,7 @@
 export interface UserData {
-  firstName: string
+  user: string
   password: string
+  isAuth: boolean
 }
 
 export type StartPageProps = {

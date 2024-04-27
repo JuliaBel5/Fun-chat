@@ -70,6 +70,7 @@ export interface EventMap {
   MSG_DELETE: MessageDeleted
   MSG_EDIT: MessageEdited
   ERROR: ErrorMessage
+  LOGIN_FAILED: undefined
   userClicked: User
   WEBSOCKET_OPEN: undefined
   WEBSOCKET_CLOSED: void
