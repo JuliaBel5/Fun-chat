@@ -1,7 +1,7 @@
-import type { Loader } from './Loader';
-import loader from './Loader';
-import { LoginPage } from './LoginPage/LoginPage';
-import { MainPage, generateUniqueTimestampID } from './MainPage/MainPage';
+import type { Loader } from '../../Components/Loader';
+import loader from '../../Components/Loader';
+import { LoginPage } from '../LoginPage/LoginPage';
+import { MainPage, generateUniqueTimestampID } from '../MainPage/MainPage';
 
 interface UserData {
   user: string

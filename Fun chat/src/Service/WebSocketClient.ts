@@ -1,8 +1,8 @@
 import {
   CustomEventEmitter,
   EventMap,
-} from '../components/EventEmitter/EventEmitter';
-import { Toast } from '../components/toast';
+} from '../EventEmitter/EventEmitter';
+import { Toast } from '../Components/toast';
 
 export class WebSocketClient extends CustomEventEmitter<EventMap> {
   private socket: WebSocket;

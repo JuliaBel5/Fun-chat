@@ -1,9 +1,9 @@
 import UserStore from '../Storage/Store';
-import { AboutPage } from '../components/AboutPage/AboutPage';
-import type { LoginPage } from '../components/LoginPage/LoginPage';
-import type { MainPage } from '../components/MainPage/MainPage';
-import { NotFoundPage } from '../components/NotFounPage/NotFoundPage';
-import { Start } from '../components/StartPage';
+import { AboutPage } from '../Pages/AboutPage/AboutPage';
+import type { LoginPage } from '../Pages/LoginPage/LoginPage';
+import type { MainPage } from '../Pages/MainPage/MainPage';
+import { NotFoundPage } from '../Pages/NotFounPage/NotFoundPage';
+import { Start } from '../Pages/StartPage/StartPage';
 
 interface Page {
   init(): void
@@ -134,8 +134,6 @@ export class AppRouter {
   };
 
   isUserAuth() {
-    // const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
-    // if (MrrrChatUserData) {
     const MrrrChatUserData = UserStore.getData();
     if (MrrrChatUserData && MrrrChatUserData.isAuth) {
       this.isAuth = true;

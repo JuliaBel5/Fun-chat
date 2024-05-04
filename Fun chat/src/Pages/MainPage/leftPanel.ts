@@ -1,8 +1,8 @@
 import UserStore from '../../Storage/Store';
 import { createElement } from '../../Utils/createElement';
 import { truncateWithEllipses } from '../../Utils/truncate';
-import { CustomEventEmitter, EventMap } from '../EventEmitter/EventEmitter';
-import { UnreadUserMessages, User } from '../EventEmitter/types';
+import { CustomEventEmitter, EventMap } from '../../EventEmitter/EventEmitter';
+import { UnreadUserMessages, User } from '../../EventEmitter/types';
 
 export class UserList extends CustomEventEmitter<EventMap> {
   leftInputContainer: HTMLDivElement;
@@ -76,10 +76,6 @@ export class UserList extends CustomEventEmitter<EventMap> {
   }
 
   public updateInactiveUsersList(users: User[]): void {
-    /* const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
-     if (MrrrChatUserData) {
-       this.user = JSON.parse(MrrrChatUserData).firstName;
-     } */
     const MrrrChatUserData = UserStore.getData();
     if (MrrrChatUserData) {
       this.user = MrrrChatUserData.user;

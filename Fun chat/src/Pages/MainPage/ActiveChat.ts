@@ -1,5 +1,5 @@
 import { createElement } from '../../Utils/createElement';
-import modal, { ModalWindow } from '../Modal';
+import modal, { ModalWindow } from '../../Components/Modal';
 
 type HandlerFunction = () => void;
 

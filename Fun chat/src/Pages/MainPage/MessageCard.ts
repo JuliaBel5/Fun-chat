@@ -1,5 +1,5 @@
 import { createElement } from '../../Utils/createElement';
-import { Message } from '../EventEmitter/types';
+import { Message } from '../../EventEmitter/types';
 
 export function createOutcomingData(message: Message, messageElement: HTMLElement) {
   const delivered = createElement('div', 'delivered');

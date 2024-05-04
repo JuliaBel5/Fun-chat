@@ -16,11 +16,11 @@ import {
   ThirdPartyUserLogout,
   UnreadUserMessages,
   User,
-} from '../EventEmitter/types';
-import type { Loader } from '../Loader';
-import loader from '../Loader';
-import modal, { ModalWindow } from '../Modal';
-import { Toast } from '../toast';
+} from '../../EventEmitter/types';
+import type { Loader } from '../../Components/Loader';
+import loader from '../../Components/Loader';
+import modal, { ModalWindow } from '../../Components/Modal';
+import { Toast } from '../../Components/toast';
 import { ActiveChat } from './ActiveChat';
 import { createMessageElement } from './MessageCard';
 import { Footer } from './footer';

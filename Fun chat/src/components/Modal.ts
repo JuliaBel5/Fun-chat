@@ -1,5 +1,5 @@
 import { createElement } from '../Utils/createElement';
-import { CustomEventEmitter, EventMap } from './EventEmitter/EventEmitter';
+import { CustomEventEmitter, EventMap } from '../EventEmitter/EventEmitter';
 
 type HandlerFunction = () => void;
 
