@@ -1,7 +1,7 @@
 import UserStore from '../Storage/Store';
 import { AboutPage } from '../Pages/AboutPage/AboutPage';
 import type { LoginPage } from '../Pages/LoginPage/LoginPage';
-import type { MainPage } from '../Pages/MainPage/MainPage';
+import type { MainPage } from '../Pages/MainPage/Controller';
 import { NotFoundPage } from '../Pages/NotFounPage/NotFoundPage';
 import { Start } from '../Pages/StartPage/StartPage';
 
@@ -55,8 +55,8 @@ export class AppRouter {
 
     this.loginPage.bindGoAboutButton(this.goToAbout);
 
-    if (this.main.header.goToAbout) {
-      this.main.header.bindGoAboutButton(this.goToAbout);
+    if (this.main.mainLayout.header.goToAbout) {
+      this.main.mainLayout.header.bindGoAboutButton(this.goToAbout);
     }
     this.about.bindMainPage(this.navigateBasedOnSession);
     this.about.bindLoginPage(this.navigateBasedOnSession);

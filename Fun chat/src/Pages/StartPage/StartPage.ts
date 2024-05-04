@@ -1,7 +1,7 @@
 import type { Loader } from '../../Components/Loader';
 import loader from '../../Components/Loader';
 import { LoginPage } from '../LoginPage/LoginPage';
-import { MainPage, generateUniqueTimestampID } from '../MainPage/MainPage';
+import { MainPage, generateUniqueTimestampID } from '../MainPage/Controller';
 
 interface UserData {
   user: string

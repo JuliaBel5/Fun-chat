@@ -21,39 +21,18 @@ import type { Loader } from '../../Components/Loader';
 import loader from '../../Components/Loader';
 import modal, { ModalWindow } from '../../Components/Modal';
 import { Toast } from '../../Components/toast';
-import { ActiveChat } from './ActiveChat';
 import { createMessageElement } from './MessageCard';
 import { Footer } from './footer';
-import { Header } from './header';
 import { UserList } from './leftPanel';
 import { StartPageProps, UserData } from './types';
+import { MainLayout } from './MainLayout';
 
 export function generateUniqueTimestampID() {
   return Date.now() + Math.random().toString(36).slice(2, 11);
 }
 
 export class MainPage {
-  gameArea: HTMLDivElement | undefined;
-
-  header: Header;
-
-  container: HTMLDivElement | undefined;
-
-  leftPanel: HTMLDivElement | undefined;
-
-  rightPanel: HTMLDivElement | undefined;
-
-  rightInputContainer: HTMLDivElement | undefined;
-
-  leftInput: HTMLInputElement | undefined;
-
-  mainInput: HTMLInputElement | undefined;
-
-  leftInputContainer: HTMLDivElement | undefined;
-
-  sendButton: HTMLButtonElement | undefined;
-
-  activeChat: ActiveChat;
+  mainLayout: MainLayout = new MainLayout();
 
   user: string | undefined;
 
@@ -65,9 +44,7 @@ export class MainPage {
 
   password: string | undefined;
 
-  startChatPanel: HTMLDivElement | undefined;
-
-  userList: UserList | undefined;
+  userList: UserList = new UserList();
 
   activeUsers: User[] | undefined;
 
@@ -94,15 +71,12 @@ export class MainPage {
   router: StartPageProps;
 
   constructor(props: StartPageProps) {
-    this.header = new Header();
-    this.header.bindLogout(this.confirm);
+    this.mainLayout.header.bindLogout(this.confirm);
     this.loader = loader;
-    this.userList = new UserList();
-    this.activeChat = new ActiveChat();
     this.toast.bindConfirmButton(this.logout);
-    this.activeChat.bindSendMessage(this.sendMessage.bind(this));
-    if (this.activeChat.mainInput) {
-      this.activeChat.mainInput.addEventListener('keydown', (event) => {
+    this.mainLayout.activeChat.bindSendMessage(this.sendMessage.bind(this));
+    if (this.mainLayout.activeChat.mainInput) {
+      this.mainLayout.activeChat.mainInput.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
           event.preventDefault();
           this.sendMessage();
@@ -110,13 +84,12 @@ export class MainPage {
         }
       });
     }
-    this.activeChat.bindHandleMessage();
+    this.mainLayout.activeChat.bindHandleMessage();
 
     this.modal.on('deleteClicked', this.deleteMessage.bind(this));
-
     this.modal.on('editClicked', this.editMessage.bind(this));
 
-    this.activeChat.bindCancelButton(this.cancelEditing.bind(this));
+    this.mainLayout.activeChat.bindCancelButton(this.cancelEditing.bind(this));
     if (!this.webSocketClient.isOpen()) {
       this.webSocketClient.connect();
     }
@@ -128,12 +101,6 @@ export class MainPage {
   }
 
   init() {
-    /* const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
-    if (MrrrChatUserData) {
-      this.user = JSON.parse(MrrrChatUserData).firstName;
-      this.password = JSON.parse(MrrrChatUserData).password;
-      this.userAuthData.firstName = JSON.parse(MrrrChatUserData).firstName;
-      this.userAuthData.firstName = JSON.parse(MrrrChatUserData).password; */
     const MrrrChatUserData = UserStore.getData();
     if (MrrrChatUserData) {
       this.user = MrrrChatUserData.user;
@@ -142,8 +109,8 @@ export class MainPage {
       this.userAuthData.password = MrrrChatUserData.password;
       this.userAuthData.isAuth = MrrrChatUserData.isAuth;
 
-      if (this.header.nameContainer && this.user) {
-        this.header.nameContainer.textContent = `User name: ${truncateWithEllipses(this.user)}`;
+      if (this.mainLayout.header.nameContainer && this.user) {
+        this.mainLayout.header.nameContainer.textContent = `User name: ${truncateWithEllipses(this.user)}`;
       }
       this.isOnline = false;
       if (this.webSocketClient.isOpen()) {
@@ -155,49 +122,26 @@ export class MainPage {
   }
 
   startChat() {
-    if (!this.userList) return;
-    this.gameArea = createElement('div', 'gamearea');
-    document.body.append(this.gameArea);
-    this.gameArea.append(this.header.header);
-
-    this.container = createElement('div', 'game-container');
-    this.gameArea.append(this.container, this.footer.footer);
-    this.leftPanel = createElement('div', 'left-panel');
-    this.rightPanel = createElement('div', 'right-panel');
-
-    this.leftPanel.append(this.userList.leftInputContainer);
-    if (
-      !this.activeChat.startChatPanel
-      || !this.activeChat.activeChat
-      || !this.activeChat.rightInputContainer
-    ) { return; }
-    this.rightPanel.append(
-      this.activeChat.startChatPanel,
-      this.activeChat.activeChat,
-      this.activeChat.rightInputContainer,
-    );
-
-    this.activeChat.activeChat.style.display = 'none';
-    this.activeChat.rightInputContainer.style.display = 'none';
-    this.container.append(this.leftPanel, this.rightPanel);
-
-    this.userList.usersContainer.addEventListener('click', (event) => {
+    this.mainLayout.init();
+    this.mainLayout.userList.usersContainer.addEventListener('click', (event) => {
       this.hideActiveChat(event);
     });
     this.divider = createElement('div', 'divider');
-    this.gameArea.append(this.divider);
+    if (!this.mainLayout.gameArea) return;
+    this.mainLayout.gameArea.append(this.divider);
     this.divider.style.display = 'none';
-    this.activeChat.activeChat.addEventListener(
+    if (!this.mainLayout.activeChat.activeChat) return;
+    this.mainLayout.activeChat.activeChat.addEventListener(
       'click',
       this.removeDivider.bind(this),
     );
 
-    this.activeChat.activeChat.addEventListener(
+    this.mainLayout.activeChat.activeChat.addEventListener(
       'wheel',
       this.removeDivider.bind(this),
     );
-    if (this.activeChat.sendButton) {
-      this.activeChat.sendButton.addEventListener(
+    if (this.mainLayout.activeChat.sendButton) {
+      this.mainLayout.activeChat.sendButton.addEventListener(
         'click',
         this.removeDivider.bind(this),
       );
@@ -205,9 +149,7 @@ export class MainPage {
   }
 
   hide() {
-    if (this.gameArea) {
-      this.gameArea.remove();
-    }
+    this.mainLayout.hide();
   }
 
   logout = () => {
@@ -215,8 +157,8 @@ export class MainPage {
       this.webSocketClient.logoutUser('', this.user, this.password);
     }
     this.activeChatLogin = '';
-    if (this.activeChat.startChatPanel) {
-      this.activeChat.startChatPanel.textContent = 'Choose a friend to chat with';
+    if (this.mainLayout.activeChat.startChatPanel) {
+      this.mainLayout.activeChat.startChatPanel.textContent = 'Choose a friend to chat with';
     }
   };
 
@@ -270,20 +212,20 @@ export class MainPage {
       this.id = generateUniqueTimestampID();
       this.webSocketClient.loginUser(this.id, this.user, this.password);
     }
-    if (this.userList) {
-      this.userList.on('userClicked', (user) => {
+    if (this.mainLayout.userList) {
+      this.mainLayout.userList.on('userClicked', (user) => {
         this.activeChatLogin = user.login;
 
         if (
-          this.activeChat.startChatPanel
-          && this.activeChat.activeChat
-          && this.activeChat.rightInputContainer
+          this.mainLayout.activeChat.startChatPanel
+          && this.mainLayout.activeChat.activeChat
+          && this.mainLayout.activeChat.rightInputContainer
         ) {
-          this.activeChat.startChatPanel.style.height = '35px';
+          this.mainLayout.activeChat.startChatPanel.style.height = '35px';
           const status = user.isLogined ? 'online' : 'offline';
-          this.activeChat.startChatPanel.textContent = `${truncateWithEllipses(user.login)}, ${status}`;
-          this.activeChat.activeChat.style.display = 'flex';
-          this.activeChat.rightInputContainer.style.display = 'flex';
+          this.mainLayout.activeChat.startChatPanel.textContent = `${truncateWithEllipses(user.login)}, ${status}`;
+          this.mainLayout.activeChat.activeChat.style.display = 'flex';
+          this.mainLayout.activeChat.rightInputContainer.style.display = 'flex';
         }
         if (this.id && this.activeChatLogin) {
           this.webSocketClient.getHistory(this.id, this.activeChatLogin);
@@ -322,15 +264,15 @@ export class MainPage {
 
   updateActiveUsers(event: ActiveUsersList) {
     this.activeUsers = event.payload.users;
-    if (this.userList) {
-      this.userList.updateActiveUsersList(this.activeUsers);
+    if (this.mainLayout.userList) {
+      this.mainLayout.userList.updateActiveUsersList(this.activeUsers);
     }
   }
 
   updateInactiveUsers(event: InactiveUsersList) {
     this.inactiveUsers = event.payload.users;
-    if (this.userList) {
-      this.userList.updateInactiveUsersList(this.inactiveUsers);
+    if (this.mainLayout.userList) {
+      this.mainLayout.userList.updateInactiveUsersList(this.inactiveUsers);
     }
     this.fetchMessageHistory();
   }
@@ -341,8 +283,8 @@ export class MainPage {
     this.webSocketClient.getAllAuthUsers();
     this.webSocketClient.getAllUnauthUsers();
     if (event.payload.user.login === this.activeChatLogin) {
-      if (!this.activeChat.startChatPanel) return;
-      this.activeChat.startChatPanel.textContent = `${truncateWithEllipses(this.activeChatLogin)}, online`;
+      if (!this.mainLayout.activeChat.startChatPanel) return;
+      this.mainLayout.activeChat.startChatPanel.textContent = `${truncateWithEllipses(this.activeChatLogin)}, online`;
       if (this.id && this.activeChatLogin) {
         this.webSocketClient.getHistory(this.id, this.activeChatLogin);
       }
@@ -355,38 +297,36 @@ export class MainPage {
     this.webSocketClient.getAllAuthUsers();
     this.webSocketClient.getAllUnauthUsers();
     if (event.payload.user.login === this.activeChatLogin) {
-      if (!this.activeChat.startChatPanel) return;
-      this.activeChat.startChatPanel.textContent = `${truncateWithEllipses(this.activeChatLogin)}, offline`;
+      if (!this.mainLayout.activeChat.startChatPanel) return;
+      this.mainLayout.activeChat.startChatPanel.textContent = `${truncateWithEllipses(this.activeChatLogin)}, offline`;
     }
   }
 
   sendMessage() {
     if (
-      this.activeChat.activeChat
-      && this.activeChat.mainInput
-      && this.activeChat.sendButton
-      && this.activeChat.startChatPanel
-      && this.activeChat.mainInput.value.trim()
+      this.mainLayout.activeChat.activeChat
+      && this.mainLayout.activeChat.mainInput
+      && this.mainLayout.activeChat.sendButton
+      && this.mainLayout.activeChat.startChatPanel
+      && this.mainLayout.activeChat.mainInput.value.trim()
     ) {
+      const text = this.mainLayout.activeChat.mainInput.value;
       if (!this.editModeId) {
-        const text = this.activeChat.mainInput.value;
         if (this.id && this.activeChatLogin) {
           this.webSocketClient.sendMessage(this.id, this.activeChatLogin, text);
         }
       } else if (
         this.id
         && this.editModeId
-        && this.activeChat.cancelButton
-        && this.activeChat.inputWrapper
+        && this.mainLayout.activeChat.cancelButton
+        && this.mainLayout.activeChat.inputWrapper
       ) {
-        const text = this.activeChat.mainInput.value;
         this.webSocketClient.editMessage(this.id, this.editModeId, text);
         this.editModeId = '';
-        this.activeChat.cancelButton.remove();
+        this.mainLayout.activeChat.cancelButton.remove();
       }
-      this.activeChat.mainInput.value = '';
-      this.activeChat.sendButton.classList.remove('submit');
-      this.activeChat.sendButton.classList.add('disabled-submit');
+      this.mainLayout.activeChat.mainInput.value = '';
+      this.mainLayout.activeChat.disableSendButton();
     }
   }
 
@@ -395,36 +335,36 @@ export class MainPage {
     if (!this.user) return;
     if (
       message.to === this.activeChatLogin // получатель === активный чат, исходящее
-      && this.activeChat.activeChat
-      && this.activeChat.activeChat.style.display !== 'none'
+      && this.mainLayout.activeChat.activeChat
+      && this.mainLayout.activeChat.activeChat.style.display !== 'none'
     ) {
       if (
-        this.activeChat.activeChat.textContent
+        this.mainLayout.activeChat.activeChat.textContent
         === 'Start to chat with your friend'
       ) {
-        this.activeChat.activeChat.textContent = '';
+        this.mainLayout.activeChat.activeChat.textContent = '';
       }
       const messageElement = createMessageElement(
         message,
         this.user,
         this.activeChatLogin,
       );
-      this.activeChat.activeChat.append(messageElement);
+      this.mainLayout.activeChat.activeChat.append(messageElement);
       messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
     } else if (
       message.from === this.activeChatLogin // отправитель === активный чат, входящее
-      && this.activeChat.activeChat
-      && this.activeChat.activeChat.style.display !== 'none'
+      && this.mainLayout.activeChat.activeChat
+      && this.mainLayout.activeChat.activeChat.style.display !== 'none'
     ) {
       const messageElement = createMessageElement(
         message,
         this.user,
         this.activeChatLogin,
       );
-      this.activeChat.activeChat.append(messageElement);
+      this.mainLayout.activeChat.activeChat.append(messageElement);
 
-      if (this.userList) {
-        const existingUser = this.userList.userMessages.find(
+      if (this.mainLayout.userList) {
+        const existingUser = this.mainLayout.userList.userMessages.find(
           (u) => u.login === message.from,
         );
         if (this.id && existingUser && existingUser.newMessages.length === 0) {
@@ -436,15 +376,15 @@ export class MainPage {
           && existingUser.newMessages.length > 0
         ) {
           existingUser.newMessages.push(message.id);
-          this.userList.updateUnreadMessagesNumber();
+          this.mainLayout.userList.updateUnreadMessagesNumber();
         }
       }
-    } else if (message.from !== this.activeChatLogin && this.userList) {
-      const existingUser = this.userList.userMessages.find(
+    } else if (message.from !== this.activeChatLogin && this.mainLayout.userList) {
+      const existingUser = this.mainLayout.userList.userMessages.find(
         (u) => u.login === message.from,
       );
       if (existingUser) existingUser.newMessages.push(message.id);
-      this.userList.updateUnreadMessagesNumber();
+      this.mainLayout.userList.updateUnreadMessagesNumber();
     }
   }
 
@@ -468,10 +408,10 @@ export class MainPage {
       if (activeUser === this.activeChatLogin) {
         // переписка открыта
         if (
-          !this.activeChat.activeChat
-          || this.activeChat.activeChat.style.display === 'none'
+          !this.mainLayout.activeChat.activeChat
+          || this.mainLayout.activeChat.activeChat.style.display === 'none'
         ) { return; }
-        this.activeChat.activeChat.textContent = ''; // сносим все сообщения
+        this.mainLayout.activeChat.activeChat.textContent = ''; // сносим все сообщения
 
         messages.forEach((message) => {
           this.handleMessage(message, messages); // обрабатываем массив
@@ -483,10 +423,10 @@ export class MainPage {
         });
       }
     } else if (
-      this.activeChat.activeChat?.style.display !== 'none'
-      && this.activeChat.activeChat
+      this.mainLayout.activeChat.activeChat?.style.display !== 'none'
+      && this.mainLayout.activeChat.activeChat
     ) {
-      this.activeChat.activeChat.textContent = 'Start to chat with your friend';
+      this.mainLayout.activeChat.activeChat.textContent = 'Start to chat with your friend';
     }
   }
 
@@ -512,8 +452,8 @@ export class MainPage {
   removeDivider() {
     if (this.divider && this.divider.style.display !== 'none') {
       this.divider.style.display = 'none';
-      if (!this.userList) return;
-      const existingUser = this.userList.userMessages.find(
+      if (!this.mainLayout.userList) return;
+      const existingUser = this.mainLayout.userList.userMessages.find(
         (u) => u.login === this.activeChatLogin,
       );
       if (!existingUser) return;
@@ -529,15 +469,15 @@ export class MainPage {
     event: ReadStatusChange | ReadStatusNotification | MessageDeleted,
   ) {
     const messageId = event.payload.message.id;
-    if (this.userList) {
+    if (this.mainLayout.userList) {
       // eslint-disable-next-line max-len
-      const activeUser: UnreadUserMessages | undefined = this.userList.userMessages.find((u) => u.newMessages.includes(messageId));
+      const activeUser: UnreadUserMessages | undefined = this.mainLayout.userList.userMessages.find((u) => u.newMessages.includes(messageId));
       if (activeUser) {
         const updatedUser: string[] = activeUser.newMessages.filter(
           (id) => id !== messageId,
         );
         activeUser.newMessages = updatedUser;
-        this.userList.updateUnreadMessagesNumber();
+        this.mainLayout.userList.updateUnreadMessagesNumber();
       } else if (this.id && this.activeChatLogin) {
         // 'ОТКРЫТ ДИАЛОГ'
         this.webSocketClient.getHistory(this.id, this.activeChatLogin);
@@ -548,7 +488,7 @@ export class MainPage {
   hideActiveChat(event: MouseEvent) {
     if (event.target instanceof HTMLElement) {
       this.activeChatLogin = '';
-      this.activeChat.hideActiveChat(event.target);
+      this.mainLayout.activeChat.hideActiveChat(event.target);
     }
   }
 
@@ -567,11 +507,11 @@ export class MainPage {
       this.activeChatLogin,
     );
 
-    if (!this.activeChat.activeChat) return;
-    this.activeChat.activeChat.append(messageElement);
+    if (!this.mainLayout.activeChat.activeChat) return;
+    this.mainLayout.activeChat.activeChat.append(messageElement);
     // обрабатываем первое непрочитанное
     if (this.isFirstNewMessage(message, messages) && this.divider) {
-      this.activeChat.activeChat.insertBefore(this.divider, messageElement);
+      this.mainLayout.activeChat.activeChat.insertBefore(this.divider, messageElement);
       this.divider.style.display = 'flex';
       this.divider.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
@@ -590,14 +530,14 @@ export class MainPage {
 
   handleUnreadMessages(message: Message, activeUser: string) {
     if (message.from === activeUser && !message.status.isReaded) {
-      if (!this.userList) return;
-      const existingUser = this.userList.userMessages.find(
+      if (!this.mainLayout.userList) return;
+      const existingUser = this.mainLayout.userList.userMessages.find(
         (u) => u.login === activeUser,
       );
       if (existingUser && !existingUser.newMessages.includes(message.id)) {
         existingUser.newMessages.push(message.id);
       }
-      this.userList.updateUnreadMessagesNumber();
+      this.mainLayout.userList.updateUnreadMessagesNumber();
     }
   }
 
@@ -612,17 +552,17 @@ export class MainPage {
     if (this.id) {
       this.webSocketClient.deleteMessage(this.id, event);
     }
-    this.activeChat.deleteMessage();
+    this.mainLayout.activeChat.deleteMessage();
   }
 
   editMessage(event: string) {
     this.editModeId = event;
-    this.activeChat.editMessage(event);
+    this.mainLayout.activeChat.editMessage(event);
   }
 
   cancelEditing() {
     this.editModeId = '';
-    this.activeChat.cancelEditing();
+    this.mainLayout.activeChat.cancelEditing();
   }
 
   handleFailedLogin() {
