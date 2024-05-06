@@ -2,7 +2,7 @@ import UserStore from '../../Storage/Store';
 import { createElement } from '../../Utils/createElement';
 import { truncateWithEllipses } from '../../Utils/truncate';
 import { CustomEventEmitter, EventMap } from '../../EventEmitter/EventEmitter';
-import { UnreadUserMessages, User } from '../../EventEmitter/types';
+import { Message, UnreadUserMessages, User } from '../../EventEmitter/types';
 
 export class UserList extends CustomEventEmitter<EventMap> {
   leftInputContainer: HTMLDivElement;
@@ -119,6 +119,18 @@ export class UserList extends CustomEventEmitter<EventMap> {
         login: user.login,
         newMessages: [],
       });
+    }
+  }
+
+  handleUnreadMessages(message: Message, activeUser: string) {
+    if (message.from === activeUser && !message.status.isReaded) {
+      const existingUser = this.userMessages.find(
+        (u) => u.login === activeUser,
+      );
+      if (existingUser && !existingUser.newMessages.includes(message.id)) {
+        existingUser.newMessages.push(message.id);
+      }
+      this.updateUnreadMessagesNumber();
     }
   }
 

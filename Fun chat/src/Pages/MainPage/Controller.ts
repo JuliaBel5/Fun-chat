@@ -419,7 +419,7 @@ export class MainPage {
       } else {
         // переписка закрыта - надо навесить кружочек
         messages.forEach((message) => {
-          this.handleUnreadMessages(message, activeUser);
+          this.mainLayout.userList.handleUnreadMessages(message, activeUser);
         });
       }
     } else if (
@@ -516,7 +516,7 @@ export class MainPage {
       this.divider.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
 
-    this.handleUnreadMessages(message, activeUser);
+    this.mainLayout.userList.handleUnreadMessages(message, activeUser);
 
     if (
       (messages[messages.length - 1].id === message.id
@@ -525,19 +525,6 @@ export class MainPage {
         && message.from === this.user)
     ) {
       messageElement.scrollIntoView({ behavior: 'instant', block: 'start' });
-    }
-  }
-
-  handleUnreadMessages(message: Message, activeUser: string) {
-    if (message.from === activeUser && !message.status.isReaded) {
-      if (!this.mainLayout.userList) return;
-      const existingUser = this.mainLayout.userList.userMessages.find(
-        (u) => u.login === activeUser,
-      );
-      if (existingUser && !existingUser.newMessages.includes(message.id)) {
-        existingUser.newMessages.push(message.id);
-      }
-      this.mainLayout.userList.updateUnreadMessagesNumber();
     }
   }
 
