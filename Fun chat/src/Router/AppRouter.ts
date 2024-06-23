@@ -1,6 +1,6 @@
 import UserStore from '../Storage/Store';
 import { AboutPage } from '../Pages/AboutPage/AboutPage';
-import type { LoginPage } from '../Pages/LoginPage/LoginPage';
+import type { LoginForm } from '../Pages/LoginForm/LoginForm';
 import type { MainPage } from '../Pages/MainPage/Controller';
 import { NotFoundPage } from '../Pages/NotFounPage/NotFoundPage';
 import { Start } from '../Pages/StartPage/StartPage';
@@ -12,7 +12,7 @@ interface Page {
 
 export class AppRouter {
   private routes: {
-    [key: string]: AboutPage | MainPage | Start | LoginPage | NotFoundPage
+    [key: string]: AboutPage | MainPage | Start | LoginForm | NotFoundPage
   };
 
   private currentPage: Page | undefined;
@@ -23,7 +23,7 @@ export class AppRouter {
 
   start: Start;
 
-  loginPage: LoginPage | undefined;
+  loginForm: LoginForm | undefined;
 
   isAuth: boolean;
 
@@ -41,7 +41,7 @@ export class AppRouter {
       navigate: () => this.navigate(),
       goToLogin: () => this.goToLogin(),
     });
-    this.loginPage = this.start.login;
+    this.loginForm = this.start.login;
     this.main = this.start.main;
     this.notFound = new NotFoundPage();
 
@@ -53,13 +53,13 @@ export class AppRouter {
       '/404': this.notFound,
     };
 
-    this.loginPage.bindGoAboutButton(this.goToAbout);
+    this.loginForm.bindGoAboutButton(this.goToAbout);
 
     if (this.main.mainLayout.header.goToAbout) {
       this.main.mainLayout.header.bindGoAboutButton(this.goToAbout);
     }
     this.about.bindMainPage(this.navigateBasedOnSession);
-    this.about.bindLoginPage(this.navigateBasedOnSession);
+    this.about.bindLoginForm(this.navigateBasedOnSession);
 
     this.navigate();
   }

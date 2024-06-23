@@ -5,11 +5,11 @@ import { CustomEventEmitter, EventMap } from '../../EventEmitter/EventEmitter';
 import { Message, UnreadUserMessages, User } from '../../EventEmitter/types';
 
 export class UserList extends CustomEventEmitter<EventMap> {
-  leftInputContainer: HTMLDivElement;
+  leftInputContainer: HTMLDivElement = createElement('div', 'search-container');
 
-  leftInput: HTMLInputElement;
+  leftInput: HTMLInputElement = createElement('input', 'left-input', '');
 
-  usersContainer: HTMLDivElement;
+  usersContainer: HTMLDivElement = createElement('div', 'users-container');
 
   user: string | undefined;
 
@@ -19,19 +19,11 @@ export class UserList extends CustomEventEmitter<EventMap> {
 
   constructor() {
     super();
-    this.leftInputContainer = createElement('div', 'search-container');
-    this.leftInput = createElement('input', 'left-input', '');
     this.leftInput.addEventListener('input', () => {
       const searchValue = this.leftInput.value.toLowerCase();
       this.filterUsers(searchValue);
     });
-
-    this.usersContainer = createElement('div', 'users-container');
     this.leftInputContainer.append(this.leftInput, this.usersContainer);
-    /* const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
-     if (MrrrChatUserData) {
-       this.user = JSON.parse(MrrrChatUserData).firstName;
-     } */
     const MrrrChatUserData = UserStore.getData();
     if (MrrrChatUserData) {
       this.user = MrrrChatUserData.user;
@@ -57,10 +49,6 @@ export class UserList extends CustomEventEmitter<EventMap> {
   public updateActiveUsersList(users: User[]): void {
     this.usersContainer.innerHTML = '';
     this.usersList = [];
-    /* const MrrrChatUserData = sessionStorage.getItem('MrrrChatUser');
-    if (MrrrChatUserData) {
-      this.user = JSON.parse(MrrrChatUserData).firstName;
-    } */
     const MrrrChatUserData = UserStore.getData();
     if (MrrrChatUserData) {
       this.user = MrrrChatUserData.user;

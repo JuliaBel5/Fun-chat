@@ -43,7 +43,7 @@ export class AboutPage {
     });
   };
 
-  bindLoginPage = (handler: HandlerFunction): void => {
+  bindLoginForm = (handler: HandlerFunction): void => {
     this.loginButton.addEventListener('click', () => {
       handler();
     });

@@ -1,7 +1,7 @@
 import {
   createElement,
   createLinkedElement,
-  createLinkedImage,
+
 } from '../../Utils/createElement';
 
 export class Footer {
@@ -40,7 +40,7 @@ export class Footer {
       'school-logo',
       'https://rs.school/courses/javascript-mentoring-program',
     );
-    this.catElement = createLinkedImage(
+    this.catElement = createLinkedElement(
       'img',
       'mini-cat',
       'https://github.com/JuliaBel5',
