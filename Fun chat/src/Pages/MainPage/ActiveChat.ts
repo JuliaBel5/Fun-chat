@@ -58,11 +58,9 @@ export class ActiveChat {
     this.mainInput.addEventListener('input', () => {
       if (this.mainInput && this.sendButton) {
         if (this.mainInput.value.trim() !== '') {
-          this.sendButton.classList.remove('disabled-submit');
-          this.sendButton.classList.add('submit');
+          this.unableSendButton();
         } else {
-          this.sendButton.classList.remove('submit');
-          this.sendButton.classList.add('disabled-submit');
+          this.disableSendButton();
         }
       }
     });
@@ -70,9 +68,34 @@ export class ActiveChat {
     this.rightInputContainer.append(this.inputWrapper, this.sendButton);
   }
 
+  unableSendButton() {
+    if (this.sendButton) {
+      this.sendButton.classList.add('submit');
+      this.sendButton.classList.remove('disabled-submit');
+      this.sendButton.disabled = false;
+    }
+  }
+
+  disableSendButton() {
+    if (this.sendButton) {
+      this.sendButton.classList.remove('submit');
+      this.sendButton.classList.add('disabled-submit');
+      this.sendButton.disabled = true;
+    }
+  }
+
   bindSendMessage = (handler: HandlerFunction) => {
     if (this.sendButton) {
-      this.sendButton.addEventListener('click', () => handler());
+      console.log('кнопка есть');
+      this.sendButton.addEventListener('click', handler);
+    }
+    if (this.mainInput) {
+      this.mainInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          handler();
+        }
+      });
     }
   };
 
@@ -114,22 +137,6 @@ export class ActiveChat {
       this.rightInputContainer.style.display = 'none';
       this.startChatPanel.style.height = '95%';
       this.startChatPanel.textContent = 'Choose a friend to chat with';
-    }
-  }
-
-  unableSendButton() {
-    if (this.sendButton) {
-      this.sendButton.classList.add('submit');
-      this.sendButton.classList.remove('disabled-submit');
-      this.sendButton.disabled = false;
-    }
-  }
-
-  disableSendButton() {
-    if (this.sendButton) {
-      this.sendButton.classList.remove('submit');
-      this.sendButton.classList.add('disabled-submit');
-      this.sendButton.disabled = true;
     }
   }
 

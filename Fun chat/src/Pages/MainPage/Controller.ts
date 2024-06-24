@@ -22,10 +22,11 @@ import loader from '../../Components/Loader';
 import modal, { ModalWindow } from '../../Components/Modal';
 import { Toast } from '../../Components/toast';
 import { createMessageElement } from './MessageCard';
-import { Footer } from './footer';
-import { UserList } from './leftPanel';
+
+import { UserList } from './LeftPanel';
 import { StartPageProps, UserData } from './types';
 import { MainLayout } from './MainLayout';
+import { Footer } from './Footer';
 
 export function generateUniqueTimestampID() {
   return Date.now() + Math.random().toString(36).slice(2, 11);
@@ -74,15 +75,8 @@ export class MainPage {
     this.mainLayout.header.bindLogout(this.confirm);
     this.loader = loader;
     this.toast.bindConfirmButton(this.logout);
-    this.mainLayout.activeChat.bindSendMessage(this.sendMessage.bind(this));
     if (this.mainLayout.activeChat.mainInput) {
-      this.mainLayout.activeChat.mainInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          this.sendMessage();
-          this.removeDivider();
-        }
-      });
+      this.mainLayout.activeChat.bindSendMessage(this.sendMessage.bind(this));
     }
     this.mainLayout.activeChat.bindHandleMessage();
 
@@ -265,14 +259,14 @@ export class MainPage {
   updateActiveUsers(event: ActiveUsersList) {
     this.activeUsers = event.payload.users;
     if (this.mainLayout.userList) {
-      this.mainLayout.userList.updateActiveUsersList(this.activeUsers);
+      this.mainLayout.userList.updateUsersList(this.activeUsers, true);
     }
   }
 
   updateInactiveUsers(event: InactiveUsersList) {
     this.inactiveUsers = event.payload.users;
     if (this.mainLayout.userList) {
-      this.mainLayout.userList.updateInactiveUsersList(this.inactiveUsers);
+      this.mainLayout.userList.updateUsersList(this.inactiveUsers);
     }
     this.fetchMessageHistory();
   }
@@ -313,6 +307,7 @@ export class MainPage {
       const text = this.mainLayout.activeChat.mainInput.value;
       if (!this.editModeId) {
         if (this.id && this.activeChatLogin) {
+          console.log('дошли');
           this.webSocketClient.sendMessage(this.id, this.activeChatLogin, text);
         }
       } else if (

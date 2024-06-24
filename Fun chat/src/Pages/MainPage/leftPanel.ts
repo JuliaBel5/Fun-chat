@@ -46,28 +46,17 @@ export class UserList extends CustomEventEmitter<EventMap> {
     });
   }
 
-  public updateActiveUsersList(users: User[]): void {
-    this.usersContainer.innerHTML = '';
-    this.usersList = [];
+  public updateUsersList(users: User[], clearContainer: boolean = false): void {
+    if (clearContainer) {
+      this.usersContainer.innerHTML = '';
+      this.usersList = [];
+    }
+
     const MrrrChatUserData = UserStore.getData();
     if (MrrrChatUserData) {
       this.user = MrrrChatUserData.user;
     }
 
-    users.forEach((user) => {
-      if (user.login !== this.user) {
-        const wrappedUser = this.addUser(user);
-        this.updateUserMessages(user);
-        this.usersList.push(wrappedUser);
-      }
-    });
-  }
-
-  public updateInactiveUsersList(users: User[]): void {
-    const MrrrChatUserData = UserStore.getData();
-    if (MrrrChatUserData) {
-      this.user = MrrrChatUserData.user;
-    }
     users.forEach((user) => {
       if (user.login !== this.user) {
         const wrappedUser = this.addUser(user);
@@ -96,30 +85,6 @@ export class UserList extends CustomEventEmitter<EventMap> {
     this.usersContainer.append(userWrapper);
 
     return userWrapper;
-  }
-
-  updateUserMessages(user: User) {
-    const existingUser = this.userMessages.find(
-      (u) => u.login === user.login, // && u.newMessages.length === 0,
-    );
-    if (!existingUser) {
-      this.userMessages.push({
-        login: user.login,
-        newMessages: [],
-      });
-    }
-  }
-
-  handleUnreadMessages(message: Message, activeUser: string) {
-    if (message.from === activeUser && !message.status.isReaded) {
-      const existingUser = this.userMessages.find(
-        (u) => u.login === activeUser,
-      );
-      if (existingUser && !existingUser.newMessages.includes(message.id)) {
-        existingUser.newMessages.push(message.id);
-      }
-      this.updateUnreadMessagesNumber();
-    }
   }
 
   updateUnreadMessagesNumber() {
@@ -151,5 +116,31 @@ export class UserList extends CustomEventEmitter<EventMap> {
         }
       }
     });
+  }
+
+  updateUserMessages(user: User) {
+    this.findOrCreateUserMessageEntry(user.login);
+  }
+
+  handleUnreadMessages(message: Message, activeUser: string) {
+    if (message.from === activeUser && !message.status.isReaded) {
+      const existingUser = this.findExistingUser(activeUser);
+      if (existingUser && !existingUser.newMessages.includes(message.id)) {
+        existingUser.newMessages.push(message.id);
+      }
+      this.updateUnreadMessagesNumber();
+    }
+  }
+
+  private findOrCreateUserMessageEntry(login: string) {
+    const existingUser = this.userMessages.find((u) => u.login === login);
+    if (!existingUser) {
+      const userMessage = { login, newMessages: [] };
+      this.userMessages.push(userMessage);
+    }
+  }
+
+  private findExistingUser(login: string) {
+    return this.userMessages.find((u) => u.login === login);
   }
 }
