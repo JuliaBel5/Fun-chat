@@ -10,7 +10,8 @@ interface UserData {
 }
 type StartPageProps = {
   navigate: () => void,
-  goToLogin: () => void
+  goToLogin: () => void,
+  goToAbout: () => void,
 };
 export class Start {
   private userAuthData: UserData | undefined;
@@ -25,14 +26,18 @@ export class Start {
 
   loader: Loader;
 
+  props: StartPageProps;
+
   constructor(props: StartPageProps) {
     this.login = new LoginForm(this.handleSubmit);
     this.main = new MainPage(props);
     this.loader = loader;
+    this.props = props;
   }
 
   init() {
     this.login.init();
+    this.login.loginView?.bindGoAboutButton(this.props.goToAbout);
   }
 
   handleSubmit = (): void => {

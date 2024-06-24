@@ -40,6 +40,7 @@ export class AppRouter {
     this.start = new Start({
       navigate: () => this.navigate(),
       goToLogin: () => this.goToLogin(),
+      goToAbout: () => this.goToAbout(),
     });
     this.loginForm = this.start.login;
     this.main = this.start.main;
@@ -53,11 +54,6 @@ export class AppRouter {
       '/404': this.notFound,
     };
 
-    this.loginForm.bindGoAboutButton(this.goToAbout);
-
-    if (this.main.mainLayout.header.goToAbout) {
-      this.main.mainLayout.header.bindGoAboutButton(this.goToAbout);
-    }
     this.about.bindMainPage(this.navigateBasedOnSession);
     this.about.bindLoginForm(this.navigateBasedOnSession);
 

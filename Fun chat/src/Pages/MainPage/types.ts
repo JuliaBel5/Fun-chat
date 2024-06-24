@@ -6,5 +6,6 @@ export interface UserData {
 
 export type StartPageProps = {
   navigate: () => void,
-  goToLogin: () => void
+  goToLogin: () => void,
+  goToAbout: () => void,
 };

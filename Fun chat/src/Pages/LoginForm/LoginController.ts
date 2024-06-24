@@ -1,81 +1,86 @@
-import { LoginView } from './LoginView';
+/* eslint-disable no-param-reassign */
 
 export class LoginController {
-  private loginView: LoginView;
+  firstNameInputIsValid: boolean;
 
-  constructor(loginView: LoginView) {
-    this.loginView = loginView;
+  passwordInputIsValid: boolean;
+
+  unableLoginButton: () => void;
+
+  disableLoginButton: () => void;
+
+  constructor(unableLoginButton: () => void, disableLoginButton: () => void) {
+    this.unableLoginButton = unableLoginButton;
+    this.disableLoginButton = disableLoginButton;
+    this.firstNameInputIsValid = false;
+    this.passwordInputIsValid = false;
   }
 
-  handleLoginErrors = (): void => {
+  handleLoginErrors = (
+    firstNameInputValue: string,
+    firstNameError: HTMLElement,
+  ): void => {
     // eslint-disable-next-line no-useless-escape
     const alphaHyphenPattern = /^[A-Za-z0-9\-]+$/;
     const uppercaseFirstLetterPattern = /^[A-Z]/;
+    this.firstNameInputIsValid = false;
+    firstNameError.textContent = '';
 
-    if (this.loginView.firstNameInput instanceof HTMLInputElement
-      && this.loginView.firstNameError) {
-      this.loginView.firstNameError.textContent = '';
-
-      if (this.loginView.firstNameInput.value
-        && !alphaHyphenPattern.test(this.loginView.firstNameInput.value)) {
-        this.loginView.firstNameError.textContent = 'Please, use numbers, English alphabet letters and hyphen';
-      } else if (
-        this.loginView.firstNameInput.value
-        && !uppercaseFirstLetterPattern.test(this.loginView.firstNameInput.value.charAt(0))
-      ) {
-        this.loginView.firstNameError.textContent = 'Your login name must begin with an uppercase letter';
-      } else if (this.loginView.firstNameInput.value
-        && this.loginView.firstNameInput.value.length < 3) {
-        this.loginView.firstNameError.textContent = 'Your login name must be at least 3 characters long';
-      } else if (this.loginView.firstNameInput.value) {
-        this.loginView.firstNameError.textContent = '';
-      }
-
-      this.updateSubmitButtonState();
-    }
-  };
-
-  handlePasswordErrors = (): void => {
-    // eslint-disable-next-line no-useless-escape
-    const alphaHyphenPattern = /^[A-Za-z0-9\-]+$/;
-    const uppercaseFirstLetterPattern = /^[A-Z]/;
-
-    if (this.loginView.passwordInput instanceof HTMLInputElement && this.loginView.passwordError) {
-      this.loginView.passwordError.textContent = '';
-
-      if (this.loginView.passwordInput.value
-        && !alphaHyphenPattern.test(this.loginView.passwordInput.value)) {
-        this.loginView.passwordError.textContent = 'Please, use numbers, English alphabet letters and hyphen';
-      } else if (
-        this.loginView.passwordInput.value
-        && !uppercaseFirstLetterPattern.test(this.loginView.passwordInput.value.charAt(0))
-      ) {
-        this.loginView.passwordError.textContent = 'Your password must begin with an uppercase letter';
-      } else if (this.loginView.passwordInput.value
-        && this.loginView.passwordInput.value.length < 4) {
-        this.loginView.passwordError.textContent = 'Your password must be at least 4 characters long';
-      } else if (this.loginView.passwordInput.value) {
-        this.loginView.passwordError.textContent = '';
-      }
-
-      this.updateSubmitButtonState();
-    }
-  };
-
-  private updateSubmitButtonState(): void {
-    if (
-      this.loginView.firstNameInput.value
-      && this.loginView.passwordInput.value
-      && !this.loginView.firstNameError.textContent
-      && !this.loginView.passwordError.textContent
+    if (firstNameInputValue
+      && !alphaHyphenPattern.test(firstNameInputValue)) {
+      firstNameError.textContent = 'Please, use numbers, English alphabet letters and hyphen';
+    } else if (
+      firstNameInputValue
+      && !uppercaseFirstLetterPattern.test(firstNameInputValue.charAt(0))
     ) {
-      this.loginView.loginButton.classList.remove('disabled');
-      this.loginView.loginButton.classList.add('startButton');
-      this.loginView.loginButton.disabled = false;
-    } else {
-      this.loginView.loginButton.classList.remove('startButton');
-      this.loginView.loginButton.classList.add('disabled');
-      this.loginView.loginButton.disabled = true;
+      firstNameError.textContent = 'Your login name must begin with an uppercase letter';
+    } else if (firstNameInputValue
+      && firstNameInputValue.length < 3) {
+      firstNameError.textContent = 'Your login name must be at least 3 characters long';
+    } else if (firstNameInputValue) {
+      firstNameError.textContent = '';
+      this.firstNameInputIsValid = true;
     }
-  }
+
+    this.updateSubmitButtonState();
+  };
+
+  handlePasswordErrors = (
+    passwordInputValue: string,
+    passwordError: HTMLElement,
+  ): void => {
+    // eslint-disable-next-line no-useless-escape
+    const alphaHyphenPattern = /^[A-Za-z0-9\-]+$/;
+    const uppercaseFirstLetterPattern = /^[A-Z]/;
+    this.passwordInputIsValid = false;
+    passwordError.textContent = '';
+
+    if (passwordInputValue
+      && !alphaHyphenPattern.test(passwordInputValue)) {
+      passwordError.textContent = 'Please, use numbers, English alphabet letters and hyphen';
+    } else if (
+      passwordInputValue
+      && !uppercaseFirstLetterPattern.test(passwordInputValue.charAt(0))
+    ) {
+      passwordError.textContent = 'Your password must begin with an uppercase letter';
+    } else if (passwordInputValue
+      && passwordInputValue.length < 4) {
+      passwordError.textContent = 'Your password must be at least 4 characters long';
+    } else if (passwordInputValue) {
+      passwordError.textContent = '';
+      this.passwordInputIsValid = true;
+    }
+    this.updateSubmitButtonState();
+  };
+
+  updateSubmitButtonState = (): void => {
+    if (
+      (this.firstNameInputIsValid
+        && this.passwordInputIsValid)
+    ) {
+      this.unableLoginButton();
+    } else {
+      this.disableLoginButton();
+    }
+  };
 }

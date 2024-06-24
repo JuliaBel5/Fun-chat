@@ -1,49 +1,38 @@
 import { createElement } from '../../Utils/createElement';
 
 type HandlerFunction = () => void;
+type HandlerFunctionWithParams = (value: string, errorFiled: HTMLElement) => void;
 
 export class LoginView {
-  gameArea: HTMLElement;
+  gameArea: HTMLElement = createElement('div', 'gamearea');
 
-  firstNameInput: HTMLInputElement;
+  firstNameInput: HTMLInputElement = createElement('input', 'input', '', 'firstName', { required: true }) as HTMLInputElement;
 
-  firstNameError: HTMLParagraphElement;
+  firstNameError: HTMLParagraphElement = createElement('p', 'error', '', 'firstNameError');
 
-  passwordInput: HTMLInputElement;
+  passwordInput: HTMLInputElement = createElement('input', 'input', '', 'password', { required: true }) as HTMLInputElement;
 
-  passwordError: HTMLParagraphElement;
+  passwordError: HTMLParagraphElement = createElement('p', 'error', '', 'passwordError');
 
-  loginButton: HTMLButtonElement;
+  loginButton: HTMLButtonElement = createElement('button', 'disabled', 'Login', 'loginButton');
 
-  audio: HTMLAudioElement;
+  audio: HTMLAudioElement = new Audio();
 
-  goToAbout: HTMLButtonElement;
+  goToAbout: HTMLButtonElement = createElement('button', 'aboutButton', 'Go to About Page', 'goToAbout');
 
-  constructor(goToAbout: HTMLButtonElement) {
-    this.gameArea = createElement('div', 'gamearea');
+  constructor() {
     document.body.append(this.gameArea);
-
-    this.audio = new Audio();
     const container = createElement('div', 'container');
     const welcome = createElement('p', 'welcomeMessage', 'Hi! Enter your name, please!');
-    this.loginButton = createElement('button', 'disabled', 'Login', 'loginButton');
-
     const buttonContainer = createElement('form', 'inputContainer');
     const leftPanel = createElement('div', 'leftPanel');
     leftPanel.style.cursor = 'pointer';
-
     const rightPanel = createElement('div', 'rightPanel');
     const firstNameLabel = createElement('label', 'label', 'Name');
-    this.firstNameInput = createElement('input', 'input', '', 'firstName', { required: true }) as HTMLInputElement;
     firstNameLabel.htmlFor = 'firstName';
-    this.firstNameError = createElement('p', 'error', '', 'firstNameError');
     const passwordLabel = createElement('label', 'label', 'Password');
-    this.passwordInput = createElement('input', 'input', '', 'password', { required: true }) as HTMLInputElement;
     this.passwordInput.type = 'password';
     passwordLabel.htmlFor = 'password';
-    this.passwordError = createElement('p', 'error', '', 'passwordError');
-
-    this.goToAbout = goToAbout;
     this.gameArea.append(container);
     container.append(leftPanel, rightPanel);
     rightPanel.append(welcome, buttonContainer, this.goToAbout);
@@ -80,12 +69,13 @@ export class LoginView {
     });
   }
 
-  bindFirstNameInput(handler: HandlerFunction): void {
-    this.firstNameInput.addEventListener('input', handler);
+  bindFirstNameInput(handler: HandlerFunctionWithParams) {
+    this.firstNameInput.addEventListener('input', () => handler(this.firstNameInput.value, this.firstNameError));
   }
 
-  bindPasswordInput(handler: HandlerFunction): void {
-    this.passwordInput.addEventListener('input', handler);
+  bindPasswordInput(handler: HandlerFunctionWithParams) {
+    this.passwordInput.addEventListener('input', () => handler(this.passwordInput.value, this.passwordError));
+    console.log(this.passwordInput.value);
   }
 
   bindSubmit(handler: HandlerFunction): void {
@@ -104,6 +94,22 @@ export class LoginView {
     this.passwordError.textContent = message;
     this.passwordInput.classList.toggle('error', !!message);
   }
+
+  bindGoAboutButton(handler: HandlerFunction): void {
+    this.goToAbout.addEventListener('click', handler);
+  }
+
+  unableLoginButton = () => {
+    this.loginButton.classList.remove('disabled');
+    this.loginButton.classList.add('startButton');
+    this.loginButton.disabled = false;
+  };
+
+  disableLoginButton = () => {
+    this.loginButton.classList.remove('startButton');
+    this.loginButton.classList.add('disabled');
+    this.loginButton.disabled = true;
+  };
 
   hide(): void {
     this.gameArea.remove();

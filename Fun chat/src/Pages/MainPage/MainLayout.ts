@@ -1,7 +1,7 @@
 import { createElement } from '../../Utils/createElement';
 import { ActiveChat } from './ActiveChat';
-import { Footer } from './Footer';
-import { Header } from './Header';
+import { Footer } from './footer';
+import { Header } from './header';
 import { UserList } from './LeftPanel';
 
 export class MainLayout {

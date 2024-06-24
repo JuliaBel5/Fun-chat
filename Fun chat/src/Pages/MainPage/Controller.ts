@@ -26,7 +26,7 @@ import { createMessageElement } from './MessageCard';
 import { UserList } from './LeftPanel';
 import { StartPageProps, UserData } from './types';
 import { MainLayout } from './MainLayout';
-import { Footer } from './Footer';
+import { Footer } from './footer';
 
 export function generateUniqueTimestampID() {
   return Date.now() + Math.random().toString(36).slice(2, 11);
@@ -73,6 +73,8 @@ export class MainPage {
 
   constructor(props: StartPageProps) {
     this.mainLayout.header.bindLogout(this.confirm);
+    this.mainLayout.header.bindGoAboutButton(props.goToAbout);
+
     this.loader = loader;
     this.toast.bindConfirmButton(this.logout);
     if (this.mainLayout.activeChat.mainInput) {
