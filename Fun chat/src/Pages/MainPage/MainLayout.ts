@@ -1,8 +1,9 @@
 import { createElement } from '../../Utils/createElement';
 import { ActiveChat } from './ActiveChat';
-import { Footer } from './footer';
-import { Header } from './header';
+
 import { UserList } from './LeftPanel';
+import { Header } from './Header';
+import { Footer } from './Footer';
 
 export class MainLayout {
   gameArea: HTMLDivElement | undefined;

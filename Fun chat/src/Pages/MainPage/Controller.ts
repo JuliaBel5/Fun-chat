@@ -26,7 +26,7 @@ import { createMessageElement } from './MessageCard';
 import { UserList } from './LeftPanel';
 import { StartPageProps, UserData } from './types';
 import { MainLayout } from './MainLayout';
-import { Footer } from './footer';
+import { Footer } from './Footer';
 
 export function generateUniqueTimestampID() {
   return Date.now() + Math.random().toString(36).slice(2, 11);

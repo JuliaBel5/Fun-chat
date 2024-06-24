@@ -86,7 +86,6 @@ export class ActiveChat {
 
   bindSendMessage = (handler: HandlerFunction) => {
     if (this.sendButton) {
-      console.log('кнопка есть');
       this.sendButton.addEventListener('click', handler);
     }
     if (this.mainInput) {
