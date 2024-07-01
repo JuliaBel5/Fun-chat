@@ -1,7 +1,6 @@
 import { createElement } from '../../Utils/createElement';
 
 type HandlerFunction = () => void;
-type HandlerFunctionWithParams = (value: string, errorFiled: HTMLElement) => void;
 
 export class LoginView {
   gameArea: HTMLElement = createElement('div', 'gamearea');
@@ -55,10 +54,11 @@ export class LoginView {
     });
 
     this.firstNameInput.addEventListener('invalid', (e: Event) => {
-      (e.target as HTMLInputElement).setCustomValidity('Please enter your first name.');
+      (e.target as HTMLInputElement).setCustomValidity('Please enter your name.');
     });
     this.firstNameInput.addEventListener('input', (e: Event) => {
       (e.target as HTMLInputElement).setCustomValidity('');
+      (e.target as HTMLInputElement).reportValidity();
     });
 
     this.passwordInput.addEventListener('invalid', (e: Event) => {
@@ -66,15 +66,30 @@ export class LoginView {
     });
     this.passwordInput.addEventListener('input', (e: Event) => {
       (e.target as HTMLInputElement).setCustomValidity('');
+      (e.target as HTMLInputElement).reportValidity();
     });
   }
 
-  bindFirstNameInput(handler: HandlerFunctionWithParams) {
-    this.firstNameInput.addEventListener('input', () => handler(this.firstNameInput.value, this.firstNameError));
+  bindFirstNameInput(handler: (value: string) => void) {
+    this.firstNameInput.addEventListener('input', () => {
+      try {
+        handler(this.firstNameInput.value);
+        this.setLoginError('');
+      } catch (error) {
+        this.setLoginError((error as Error).message);
+      }
+    });
   }
 
-  bindPasswordInput(handler: HandlerFunctionWithParams) {
-    this.passwordInput.addEventListener('input', () => handler(this.passwordInput.value, this.passwordError));
+  bindPasswordInput(handler: (value: string) => void) {
+    this.passwordInput.addEventListener('input', () => {
+      try {
+        handler(this.passwordInput.value);
+        this.setPasswordError('');
+      } catch (error) {
+        this.setPasswordError((error as Error).message);
+      }
+    });
     console.log(this.passwordInput.value);
   }
 
@@ -87,12 +102,12 @@ export class LoginView {
 
   setLoginError(message: string): void {
     this.firstNameError.textContent = message;
-    this.firstNameInput.classList.toggle('error', !!message);
+    this.firstNameInput.classList.toggle('error-input', !!message);
   }
 
   setPasswordError(message: string): void {
     this.passwordError.textContent = message;
-    this.passwordInput.classList.toggle('error', !!message);
+    this.passwordInput.classList.toggle('error-input', !!message);
   }
 
   bindGoAboutButton(handler: HandlerFunction): void {
