@@ -75,8 +75,10 @@ export class LoginView {
       try {
         handler(this.firstNameInput.value);
         this.setLoginError('');
+        this.unableLoginButton();
       } catch (error) {
         this.setLoginError((error as Error).message);
+        this.disableLoginButton();
       }
     });
   }
@@ -86,11 +88,12 @@ export class LoginView {
       try {
         handler(this.passwordInput.value);
         this.setPasswordError('');
+        this.unableLoginButton();
       } catch (error) {
         this.setPasswordError((error as Error).message);
+        this.disableLoginButton();
       }
     });
-    console.log(this.passwordInput.value);
   }
 
   bindSubmit(handler: HandlerFunction): void {

@@ -1,5 +1,4 @@
 /* eslint-disable no-useless-escape */
-/* eslint-disable no-param-reassign */
 
 export class LoginController {
   firstNameInputIsValid: boolean = false;
@@ -29,11 +28,7 @@ export class LoginController {
       throw new Error('Your login name must begin with an uppercase letter');
     } else if (firstNameInputValue && firstNameInputValue.length < 3) {
       throw new Error('Your login name must be at least 3 characters long');
-    } else if (firstNameInputValue) {
-      this.firstNameInputIsValid = true;
     }
-
-    this.updateSubmitButtonState();
   };
 
   handlePasswordErrors = (passwordInputValue: string): void => {
@@ -46,20 +41,6 @@ export class LoginController {
       throw new Error('Your password must include at least one uppercase letter');
     } else if (passwordInputValue && passwordInputValue.length < 4) {
       throw new Error('Your password must be at least 4 characters long');
-    } else if (passwordInputValue) {
-      this.passwordInputIsValid = true;
-    }
-    this.updateSubmitButtonState();
-  };
-
-  updateSubmitButtonState = (): void => {
-    if (
-      (this.firstNameInputIsValid
-        && this.passwordInputIsValid)
-    ) {
-      this.unableLoginButton();
-    } else {
-      this.disableLoginButton();
     }
   };
 }
