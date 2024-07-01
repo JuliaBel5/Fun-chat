@@ -1,10 +1,6 @@
 /* eslint-disable no-useless-escape */
 
 export class LoginController {
-  firstNameInputIsValid: boolean = false;
-
-  passwordInputIsValid: boolean = false;
-
   alphaHyphenPattern: RegExp = /^[A-Za-z0-9\-]+$/;
 
   uppercaseLetterPattern: RegExp = /[A-Z]/;
@@ -19,8 +15,6 @@ export class LoginController {
   }
 
   handleLoginErrors = (firstNameInputValue: string): void => {
-    this.firstNameInputIsValid = false;
-
     if (firstNameInputValue && !this.alphaHyphenPattern.test(firstNameInputValue)) {
       throw new Error('Please, use numbers, English alphabet letters and hyphen');
     } else if (firstNameInputValue
@@ -32,8 +26,6 @@ export class LoginController {
   };
 
   handlePasswordErrors = (passwordInputValue: string): void => {
-    this.passwordInputIsValid = false;
-
     if (passwordInputValue && !this.alphaHyphenPattern.test(passwordInputValue)) {
       throw new Error('Please, use numbers, English alphabet letters and hyphen');
     } else if (passwordInputValue

@@ -1,9 +1,9 @@
-import UserStore from '../Storage/Store';
 import { AboutPage } from '../Pages/AboutPage/AboutPage';
 import type { LoginForm } from '../Pages/LoginForm/LoginForm';
 import type { MainPage } from '../Pages/MainPage/Controller';
 import { NotFoundPage } from '../Pages/NotFounPage/NotFoundPage';
 import { Start } from '../Pages/StartPage/StartPage';
+import { isUserAuth } from '../Utils/isUserAuth';
 
 interface Page {
   init(): void
@@ -30,11 +30,6 @@ export class AppRouter {
   notFound: NotFoundPage;
 
   constructor() {
-    window.addEventListener('popstate', (event) => {
-      const path = event.state?.path || '/';
-      this.navigate(path, 1);
-    });
-
     this.isAuth = false;
     this.about = new AboutPage();
     this.start = new Start({
@@ -54,23 +49,29 @@ export class AppRouter {
       '/404': this.notFound,
     };
 
-    this.about.bindMainPage(this.navigateBasedOnSession);
-    this.about.bindLoginForm(this.navigateBasedOnSession);
-
+    this.setupPopStateListener();
+    this.bindPageHandlers();
     this.navigate();
   }
 
-  navigate(path?: string, num?: number) {
+  private setupPopStateListener() {
+    window.addEventListener('popstate', (event) => {
+      const path = event.state?.path || '/';
+      this.navigate(path, true);
+    });
+  }
+
+  private bindPageHandlers() {
+    this.about.bindMainPage(this.navigateBasedOnSession);
+    this.about.bindLoginForm(this.navigateBasedOnSession);
+  }
+
+  navigate(path: string = window.location.pathname, replaceState: boolean = false) {
     if (this.currentPage) {
       this.currentPage.hide();
     }
-    if (!path) {
-      const currentPath = window.location.pathname;
-      this.navigate(currentPath);
-      return;
-    }
 
-    this.isAuth = this.isUserAuth();
+    this.isAuth = isUserAuth();
 
     if ((path === '/login' && this.isAuth) || (path === '/' && this.isAuth)) {
       this.navigate('/main');
@@ -82,20 +83,10 @@ export class AppRouter {
       return;
     }
 
-    if (!num) {
-      if (path) {
-        window.history.pushState({ path }, '', path);
-      } else {
-        window.history.replaceState(
-          { path: window.location.pathname },
-          '',
-          window.location.pathname,
-        );
-      }
-    } else if (num) {
-      if (path) {
-        window.history.replaceState({ path }, '', path);
-      }
+    if (!replaceState) {
+      window.history.pushState({ path }, '', path);
+    } else {
+      window.history.replaceState({ path }, '', path);
     }
 
     const currentPath = window.location.pathname;
@@ -107,17 +98,11 @@ export class AppRouter {
     this.navigate(path);
   }
 
-  goToMain = () => {
-    this.navigate('/main');
-  };
+  goToMain = () => this.goTo('/main');
 
-  goToLogin = () => {
-    this.navigate('/login');
-  };
+  goToLogin = () => this.goTo('/login');
 
-  goToAbout = () => {
-    this.navigate('/about');
-  };
+  goToAbout = () => this.goTo('/about');
 
   navigateBasedOnSession = () => {
     const userData = sessionStorage.getItem('MrrrChatUser');
@@ -128,16 +113,6 @@ export class AppRouter {
       this.navigate('/login');
     }
   };
-
-  isUserAuth() {
-    const MrrrChatUserData = UserStore.getData();
-    if (MrrrChatUserData && MrrrChatUserData.isAuth) {
-      this.isAuth = true;
-    } else {
-      this.isAuth = false;
-    }
-    return this.isAuth;
-  }
 }
 
 export const router = new AppRouter();
