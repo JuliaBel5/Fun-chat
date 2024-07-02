@@ -16,23 +16,23 @@ type StartPageProps = {
 export class Start {
   private userAuthData: UserData | undefined;
 
-  user: string | undefined;
+  private user: string | undefined;
 
-  main: MainPage;
+  private password: string | undefined;
 
-  login: LoginForm;
+  private loader: Loader;
 
-  password: string | undefined;
+  private props: StartPageProps;
 
-  loader: Loader;
+  private main: MainPage;
 
-  props: StartPageProps;
+  private login: LoginForm;
 
   constructor(props: StartPageProps) {
+    this.props = props;
+    this.loader = loader;
     this.login = new LoginForm(this.handleSubmit);
     this.main = new MainPage(props);
-    this.loader = loader;
-    this.props = props;
   }
 
   init() {
@@ -41,41 +41,57 @@ export class Start {
   }
 
   handleSubmit = (): void => {
-    if (
-      !this.login.loginView
-      || !(this.login.loginView.firstNameInput instanceof HTMLInputElement)
-      || !(this.login.loginView.passwordInput instanceof HTMLInputElement)
-    ) {
-      return;
-    }
-    const { firstNameInput, passwordInput } = this.login.loginView;
-    const firstNameValue = firstNameInput.value.trim();
-    const passwordValue = passwordInput.value.trim();
+    if (!this.isLoginViewValid()) return;
 
-    if (firstNameValue && passwordValue && this.login.loginView.gameArea) {
-      this.userAuthData = { user: firstNameValue, password: passwordValue, isAuth: false };
-      this.user = firstNameValue;
-      this.password = passwordValue;
+    const { firstNameValue, passwordValue } = this.getInputValues();
 
-      if (this.main.userList) {
-        this.main.userList.user = firstNameValue;
-        sessionStorage.setItem(
-          'MrrrChatUser',
-          JSON.stringify(this.userAuthData),
-        );
-        this.main.id = generateUniqueTimestampID();
-        if (this.user && this.password) {
-          this.main.webSocketClient.loginUser(
-            this.main.id,
-            this.user,
-            this.password,
-          );
-        }
-        this.loader.init();
-        this.loader.showLoader();
-      }
+    if (this.areCredentialsValid(firstNameValue, passwordValue)) {
+      this.setUserAuthData(firstNameValue, passwordValue);
+      this.initializeMainPage();
+      this.showLoader();
     }
   };
+
+  private initializeMainPage() {
+    if (this.main.userList) {
+      this.main.userList.user = this.user!;
+      sessionStorage.setItem('MrrrChatUser', JSON.stringify(this.userAuthData));
+      this.main.id = generateUniqueTimestampID();
+
+      if (this.user && this.password) {
+        this.main.webSocketClient.loginUser(this.main.id, this.user, this.password);
+      }
+    }
+  }
+
+  private isLoginViewValid(): boolean {
+    return (
+      !!this.login.loginView
+      && this.login.loginView.firstNameInput instanceof HTMLInputElement
+      && this.login.loginView.passwordInput instanceof HTMLInputElement
+    );
+  }
+
+  private getInputValues() {
+    const firstNameValue = this.login.loginView!.firstNameInput.value.trim();
+    const passwordValue = this.login.loginView!.passwordInput.value.trim();
+    return { firstNameValue, passwordValue };
+  }
+
+  private areCredentialsValid(firstName: string, password: string): boolean {
+    return !!firstName && !!password && !!this.login.loginView?.gameArea;
+  }
+
+  private setUserAuthData(user: string, password: string) {
+    this.userAuthData = { user, password, isAuth: false };
+    this.user = user;
+    this.password = password;
+  }
+
+  private showLoader() {
+    this.loader.init();
+    this.loader.showLoader();
+  }
 
   hide() {
     if (!this.login.loginView) return;
